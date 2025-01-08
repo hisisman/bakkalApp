@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <style>
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .slider {
+            display: flex;
+            transition: transform 1s ease-in-out;
+        }
+
+        .slide {
+            width: 100%;
+            height: 300px;
+            background-color: #ddd;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .products {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 30px;
+        }
+
+        .product {
+            width: 200px;
+            height: 250px;
+            background-color: #f5f5f5;
+            text-align: center;
+            padding: 10px;
+        }
+
+        .buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .btn {
+            margin-left: 10px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <!-- Kullanıcı Adı -->
+    <div class="user-info">
+        <span th:if="${username}" class="welcome-message">
+            Merhaba, <span th:text="${username}"></span>!
+        </span>
+            <span th:unless="${username}">
+            Merhaba, Ziyaretçi!
+        </span>
+    </div>
+    <!-- En üst sağda butonlar -->
+    <div class="buttons">
+        <a th:href="@{/register}" class="btn btn-primary" th:if="${username} == null">Üye Ol</a>
+        <a th:href="@{/login}" class="btn btn-secondary"  th:if="${username} == null">Giriş Yap</a>
+        <form action="/logout" method="POST" th:if="${username} != null">
+            <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+        </form>
+    </div>
+
+    <!-- Slidebar (Slider) -->
+    <div class="slider-container mt-4">
+        <div class="slider" id="slider">
+            <!-- Slide 1 -->
+            <div class="slide" style="background-image: url('https://via.placeholder.com/1500x300?text=Ürün+1');"></div>
+            <!-- Slide 2 -->
+            <div class="slide" style="background-image: url('https://via.placeholder.com/1500x300?text=Ürün+2');"></div>
+            <!-- Slide 3 -->
+            <div class="slide" style="background-image: url('https://via.placeholder.com/1500x300?text=Ürün+3');"></div>
+        </div>
+    </div>
+
+    <!-- Ürünler -->
+    <div class="products mt-4">
+        <div class="product">
+            <h5>Ürün 1</h5>
+            <p>Ürün açıklaması</p>
+        </div>
+        <div class="product">
+            <h5>Ürün 2</h5>
+            <p>Ürün açıklaması</p>
+        </div>
+        <div class="product">
+            <h5>Ürün 3</h5>
+            <p>Ürün açıklaması</p>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    let currentIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function changeSlide() {
+        currentIndex = (currentIndex + 1) % totalSlides;
+        document.getElementById('slider').style.transform = `translateX(-${currentIndex * 100}%)`;
+    }
+
+    setInterval(changeSlide, 5000); // 5 saniyede bir değişir
+</script>
+</body>
+</html>
