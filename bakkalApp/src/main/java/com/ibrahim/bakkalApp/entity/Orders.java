@@ -12,7 +12,6 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Orders {
-//en son ki commit3
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
