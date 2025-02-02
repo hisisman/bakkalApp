@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="es-ES">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -99,9 +99,9 @@
 </div>
 <script th:if="${successMessage}">
     // Kayıt başarılı mesajını popup olarak göster
-    alert([[${successMessage}]]);
+    alert("[[${successMessage}]]");
 </script>
 
-<script src="/js/script.js"></script>
+<!-- <script src="/js/script.js"></script> -->
 </body>
 </html>

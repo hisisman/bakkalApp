@@ -3,7 +3,6 @@ package com.ibrahim.bakkalApp.service;
 import com.ibrahim.bakkalApp.entity.User;
 import com.ibrahim.bakkalApp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
