@@ -12,7 +12,7 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Orders {
-//en son ki commit
+	//halil son commit
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
