@@ -18,28 +18,42 @@ public class SecurityConfig {
 		this.userDetailsService = userDetailsService;
 	}
 
-	@Bean
-	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http
-				.authorizeHttpRequests(authorizeRequests ->
-						authorizeRequests
-								.requestMatchers("/login", "/register", "/css/**", "/js/**", "/images/**").permitAll()  // Login sayfasına ve statik dosyalara erişim izni
-								.anyRequest().authenticated()  // Diğer sayfalara kimlik doğrulama
-				)
-				.formLogin(formLogin ->
-						formLogin
-								.loginPage("/login")  // Login sayfasına özel yönlendirme
-								.defaultSuccessUrl("/home", true)  // Başarılı giriş sonrası yönlendirme
-								.permitAll()
-				)
-				.logout(logout -> logout
-						.logoutUrl("/logout")  // Çıkış URL'si
-						.logoutSuccessUrl("/login?logout")  // Çıkış başarılı olduğunda yönlendirme
-						.permitAll());
-		return http.build();
-	}
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/login",
+                                "/register",
+                                "/css/**",
+                                "/js/**",
+                                "/images/**",
+                                "/h2-console/**"   // H2 console ve tüm alt endpointler
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .headers(headers -> headers
+                        .frameOptions(frame -> frame.disable()) // iframe için
+                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**") // CSRF kontrolünden muaf tut
+                )
+                .formLogin(formLogin -> formLogin
+                        .loginPage("/home")
+                        .defaultSuccessUrl("/home", true)
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout")
+                        .permitAll()
+                );
 
-	/*
+        return http.build();
+    }
+
+
+    /*
 	@Bean
 	@Primary
 	public @Lazy UserDetailsService userDetailsService() {

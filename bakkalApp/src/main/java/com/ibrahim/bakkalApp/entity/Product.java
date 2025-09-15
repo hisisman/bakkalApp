@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(name = "products")
 public class Product {
 
 	@Id
@@ -19,4 +20,5 @@ public class Product {
 	private String description;
 	private double price;
 	private int stockQuantity;
+    private String imageUrl; // ürün resmi için yeni alan
 }

@@ -3,118 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Bakkal App</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
     <style>
+        body { background-color: #f8f9fa; }
+
+        /* Navbar */
+        .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1030; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
+        .navbar .ml-auto { display: flex; align-items: center; }
+        .cart-badge { position: absolute; top: -5px; right: -10px; font-size: 12px; }
+
+        /* Slider */
+        .slider {
+            display: flex;
+            height: 100%;
+            transition: transform 0.5s ease-in-out;
+        }
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
         .slider-container {
             position: relative;
             width: 100%;
-            height: 300px;
+            max-width: 1200px;
+            height: 350px;
+            margin: 20px auto;
             overflow: hidden;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
         }
-
-        .slider {
-            display: flex;
-            transition: transform 1s ease-in-out;
-        }
-
-        .slide {
-            width: 100%;
-            height: 300px;
-            background-color: #ddd;
-            background-size: cover;
-            background-position: center;
-        }
-
-        .products {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 30px;
-        }
-
-        .product {
-            width: 200px;
-            height: 250px;
-            background-color: #f5f5f5;
-            text-align: center;
-            padding: 10px;
-        }
-
-        .buttons {
+        /* Slider butonları */
+        .slider-button {
             position: absolute;
-            top: 10px;
-            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0,0,0,0.4);
+            border: none;
+            color: white;
+            font-size: 28px;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            z-index: 2;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .btn {
-            margin-left: 10px;
+        .slider-button:hover {
+            background: rgba(0,0,0,0.7);
+            transform: translateY(-50%) scale(1.2);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
         }
+        #prev-slide { left: 15px; }
+        #next-slide { right: 15px; }
+
+        /* Ürünler */
+        .products { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 40px; }
+        .product { width: 220px; margin: 15px; padding: 15px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out; position: relative; }
+        .product:hover { transform: scale(1.05); }
+        .product h5 { font-weight: bold; margin-bottom: 10px; }
+        .product p { font-size: 14px; color: #666; }
+        .product .price { font-size: 18px; font-weight: bold; color: #28a745; margin-top: 10px; }
+        .product form { margin-top: 10px; }
+
+        /* Kullanıcı butonları */
+        .user-buttons { display: flex; align-items: center; }
+        .user-buttons a, .user-buttons button { margin-left: 10px; }
+
+        /* Toast */
+        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
+        .toast { background: #28a745; color: #fff; padding: 10px 15px; border-radius: 5px; margin-top: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.5s ease; }
     </style>
 </head>
 <body>
-<div class="container">
-    <!-- Kullanıcı Adı -->
-    <div class="user-info">
-        <span th:if="${username}" class="welcome-message">
-            Merhaba, <span th:text="${username}"></span>!
-        </span>
-            <span th:unless="${username}">
-            Merhaba, Ziyaretçi!
-        </span>
-    </div>
-    <!-- En üst sağda butonlar -->
-    <div class="buttons">
-        <a th:href="@{/register}" class="btn btn-primary" th:if="${username} == null">Üye Ol</a>
-        <a th:href="@{/login}" class="btn btn-secondary"  th:if="${username} == null">Giriş Yap</a>
-        <form action="/logout" method="POST" th:if="${username} != null">
-            <button type="submit" class="btn btn-danger">Çıkış Yap</button>
-        </form>
-    </div>
 
-    <!-- Slidebar (Slider) -->
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">Bakkal App</a>
+
+    <div class="ml-auto d-flex align-items-center">
+        <a th:href="@{/cart}" class="btn btn-outline-primary position-relative mr-2">
+            🛒 Sepetim
+            <span id="cart-count" class="badge badge-danger cart-badge" th:text="${cartItemCount}">0</span>
+        </a>
+
+        <div class="user-buttons">
+            <a th:href="@{/register}" class="btn btn-primary" th:if="${username} == null">Üye Ol</a>
+            <a th:href="@{/login}" class="btn btn-secondary" th:if="${username} == null">Giriş Yap</a>
+            <form action="/logout" method="POST" th:if="${username} != null" class="d-inline">
+                <button type="submit" class="btn btn-danger">Çıkış Yap</button>
+            </form>
+        </div>
+    </div>
+</nav>
+
+<div style="padding-top: 70px;"></div>
+
+<div class="container mt-3">
+    <!-- Slider -->
     <div class="slider-container mt-4">
         <div class="slider" id="slider">
-            <!-- Slide 1 -->
-            <div class="slide" style="background-image: url('https://via.placeholder.com/1500x300?text=Ürün+1');"></div>
-            <!-- Slide 2 -->
-            <div class="slide" style="background-image: url('https://via.placeholder.com/1500x300?text=Ürün+2');"></div>
-            <!-- Slide 3 -->
-            <div class="slide" style="background-image: url('https://via.placeholder.com/1500x300?text=Ürün+3');"></div>
+            <div class="slide" style="background-image: url('/images/kampanya-1.png');"></div>
+            <div class="slide" style="background-image: url('/images/kampanya-2.png');"></div>
+            <div class="slide" style="background-image: url('/images/kampanya-3.png');"></div>
         </div>
+        <button class="slider-button" id="prev-slide">&#10094;</button>
+        <button class="slider-button" id="next-slide">&#10095;</button>
     </div>
 
     <!-- Ürünler -->
-    <div class="products mt-4">
-        <div class="product">
-            <h5>Ürün 1</h5>
-            <p>Ürün açıklaması</p>
-        </div>
-        <div class="product">
-            <h5>Ürün 2</h5>
-            <p>Ürün açıklaması</p>
-        </div>
-        <div class="product">
-            <h5>Ürün 3</h5>
-            <p>Ürün açıklaması</p>
+    <h3 class="text-center mt-5">Ürünler</h3>
+    <div class="products">
+        <div th:each="product : ${products}" class="product"
+             th:data-id="${product.id}"
+             th:data-name="${product.name}"
+             th:data-price="${product.price}">
+            <img th:src="${product.imageUrl}" alt="Ürün Resmi" style="width:100%; height:150px; object-fit:cover; border-radius:8px;"/>
+            <h5 th:text="${product.name}">Ürün Adı</h5>
+            <p th:text="${product.description}">Ürün açıklaması</p>
+            <div class="price" th:text="${product.price + ' ₺'}">0 ₺</div>
+            <form th:action="@{/cart/add}" method="post" class="add-to-cart-form">
+                <input type="hidden" name="productId" th:value="${product.id}"/>
+                <input type="hidden" name="name" th:value="${product.name}"/>
+                <input type="hidden" name="price" th:value="${product.price}"/>
+                <input type="hidden" name="quantity" value="1"/>
+                <button type="submit" class="btn btn-sm btn-success mt-2 add-to-cart-btn">Sepete Ekle</button>
+            </form>
         </div>
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<div id="toast-container"></div>
 
 <script>
+    // Slider
     let currentIndex = 0;
     const slides = document.querySelectorAll('.slide');
     const totalSlides = slides.length;
+    const slider = document.getElementById('slider');
 
-    function changeSlide() {
+    function showSlide(index) { slider.style.transform = `translateX(-${index * 100}%)`; }
+    function updateSlide(index) {
+        document.getElementById('slider').style.transform = `translateX(-${index * 100}%)`;
+    }
+    // Otomatik slide
+    setInterval(() => { currentIndex = (currentIndex + 1) % totalSlides; showSlide(currentIndex); }, 5000);
+
+    // Sol / sağ butonlar
+    document.getElementById('prev-slide').addEventListener('click', () => {
+        currentIndex = (currentIndex - 1 + totalSlides) % totalSlides; updateSlide(currentIndex);
+    });
+    document.getElementById('next-slide').addEventListener('click', () => {
+        currentIndex = (currentIndex + 1) % totalSlides; updateSlide(currentIndex);
+    });
+
+
+    // Otomatik kaydırma
+    setInterval(() => {
         currentIndex = (currentIndex + 1) % totalSlides;
-        document.getElementById('slider').style.transform = `translateX(-${currentIndex * 100}%)`;
+        updateSlide(currentIndex);
+    }, 5000);
+
+    // Sepete ekle & toast
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    function updateCartCount() {
+        const countSpan = document.getElementById('cart-count');
+        const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+        countSpan.textContent = totalItems;
+    }
+    updateCartCount();
+
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast';
+        toast.innerText = message;
+        const container = document.getElementById('toast-container');
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '1'; }, 10);
+        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => container.removeChild(toast), 500); }, 2500);
     }
 
-    setInterval(changeSlide, 5000); // 5 saniyede bir değişir
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productDiv = this.closest('.product');
+            const product = {
+                id: productDiv.dataset.id,
+                name: productDiv.dataset.name,
+                price: parseFloat(productDiv.dataset.price),
+                quantity: 1
+            };
+            const existing = cart.find(p => p.id === product.id);
+            if (existing) existing.quantity++;
+            else cart.push(product);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartCount();
+            showToast(`${product.name} sepete eklendi!`);
+        });
+    });
 </script>
+
 </body>
 </html>
