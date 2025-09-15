@@ -25,24 +25,26 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/register",
-                                "/checkout",           // BU SATIRI EKLEYİN
-                                "/checkout/success",   // BU SATIRI EKLEYİN
+                                "/checkout",
+                                "/checkout/success",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
-                                "/h2-console/**"   // H2 console ve tüm alt endpointler
+                                "/h2-console/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .headers(headers -> headers
-                        .frameOptions(frame -> frame.disable()) // iframe için
+                        .frameOptions(frame -> frame.disable())
                 )
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**") // CSRF kontrolünden muaf tut
+                        .ignoringRequestMatchers("/h2-console/**")
                 )
                 .formLogin(formLogin -> formLogin
-                        .loginPage("/home")
-                        .defaultSuccessUrl("/home", true)
+                        .loginPage("/login") // DÜZELTME: /home yerine /login
+                        .loginProcessingUrl("/login") // Formun submit edileceği URL
+                        .defaultSuccessUrl("/home", true) // Başarılı girişte yönlendirme
+                        .failureUrl("/login?error=true") // Hatalı girişte yönlendirme
                         .permitAll()
                 )
                 .logout(logout -> logout

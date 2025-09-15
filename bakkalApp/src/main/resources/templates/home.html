@@ -1,58 +1,531 @@
 <!DOCTYPE html>
-<html lang="tr">
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bakkal App</title>
+    <title>Bakkal App - Taze Lezzetler Kapınızda</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { background-color: #f8f9fa; padding-top: 70px; }
+        :root {
+            --primary: #28a745;
+            --secondary: #6c757d;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #28a745;
+            --warning: #ffc107;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+            min-height: 100vh;
+            padding-top: 80px;
+            font-family: 'Poppins', sans-serif;
+        }
+
         /* Navbar */
-        .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1030; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-        .navbar .ml-auto { display: flex; align-items: center; }
-        .cart-badge { position: absolute; top: -5px; right: -10px; font-size: 12px; }
+        .navbar {
+            background: linear-gradient(90deg, var(--primary), #20c997) !important;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.8rem;
+            color: white !important;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .navbar-brand i {
+            margin-right: 10px;
+        }
+
+        .user-info {
+            color: white !important;
+            margin-right: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        .user-info i {
+            margin-right: 8px;
+            font-size: 1.1rem;
+        }
+
+        .cart-btn {
+            background: rgba(255,255,255,0.2) !important;
+            border: 2px solid rgba(255,255,255,0.3) !important;
+            color: white !important;
+            border-radius: 25px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            margin-right: 15px;
+        }
+
+        .cart-btn:hover {
+            background: rgba(255,255,255,0.3) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            font-size: 12px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-buttons .btn {
+            border-radius: 25px;
+            padding: 10px 20px;
+            margin-left: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .user-buttons .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
+        /* Sticky Cart Button */
+        .sticky-cart {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: none;
+        }
+
+        .sticky-cart-btn {
+            background: linear-gradient(135deg, var(--primary), #20c997);
+            border: none;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .sticky-cart-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.5);
+        }
+
+        .sticky-cart-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(45deg, #ff6b6b, #ee5a24);
+            color: white;
+            border-radius: 50%;
+            width: 25px;
+            height: 25px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
         /* Slider */
-        .slider-container { position: relative; width: 100%; max-width: 1200px; height: 350px; margin: 20px auto; overflow: hidden; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
-        .slider { display: flex; height: 100%; transition: transform 0.5s ease-in-out; }
-        .slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; }
-        .slider-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.4); border: none; color: white; font-size: 28px; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
-        .slider-button:hover { background: rgba(0,0,0,0.7); transform: translateY(-50%) scale(1.2); box-shadow: 0 6px 15px rgba(0,0,0,0.5); }
-        #prev-slide { left: 15px; }
-        #next-slide { right: 15px; }
-        /* Ürünler */
-        .products { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 40px; }
-        .product { width: 220px; margin: 15px; padding: 15px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out; position: relative; }
-        .product:hover { transform: scale(1.05); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
-        .product h5 { font-weight: bold; margin-bottom: 10px; }
-        .product p { font-size: 14px; color: #666; }
-        .product .price { font-size: 18px; font-weight: bold; color: #28a745; margin-top: 10px; }
-        .product form { margin-top: 10px; }
+        .slider-container {
+            position: relative;
+            width: 100%;
+            max-width: 1200px;
+            height: 400px;
+            margin: 30px auto;
+            overflow: hidden;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+        .slider {
+            display: flex;
+            height: 100%;
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .slide {
+            min-width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            position: relative;
+        }
+
+        .slide::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+        }
+
+        .slider-button {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255,255,255,0.9);
+            border: none;
+            color: var(--primary);
+            font-size: 24px;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .slider-button:hover {
+            background: white;
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        #prev-slide { left: 20px; }
+        #next-slide { right: 20px; }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 40px 0;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 15px 25px;
+            border-radius: 50px;
+            font-weight: 500;
+            color: var(--dark);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        /* Products */
+        .products-section {
+            padding: 40px 0;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), #20c997);
+            border-radius: 2px;
+        }
+
+        .products {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .product {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .product:hover .product-image {
+            transform: scale(1.05);
+        }
+
+        .product h5 {
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .product-description {
+            color: #6c757d;
+            font-size: 0.9rem;
+            line-height: 1.4;
+            margin-bottom: 15px;
+            height: 40px;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .add-to-cart-btn {
+            background: linear-gradient(135deg, var(--primary), #20c997);
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            width: 100%;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .add-to-cart-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .cart-quantity {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .quantity-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            border: 2px solid var(--primary);
+            background: white;
+            color: var(--primary);
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .quantity-btn:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .quantity-display {
+            font-weight: 600;
+            font-size: 1.1rem;
+            min-width: 30px;
+            text-align: center;
+        }
+
         /* Toast */
-        #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
-        .toast { background: #28a745; color: #fff; padding: 10px 15px; border-radius: 5px; margin-top: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.5s ease; }
+        #toast-container {
+            position: fixed;
+            bottom: 100px;
+            right: 30px;
+            z-index: 2000;
+        }
+
+        .toast {
+            background: linear-gradient(135deg, var(--primary), #20c997);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            margin-top: 10px;
+            box-shadow: 0 5px 20px rgba(40, 167, 69, 0.3);
+            opacity: 0;
+            transition: all 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast i {
+            font-size: 1.2rem;
+        }
+
+        .toast.error-toast {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+        }
+
+        /* Features */
+        .features {
+            background: white;
+            padding: 60px 0;
+            margin-top: 60px;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 30px;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary), #20c997);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 2rem;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            color: white;
+            padding: 40px 0;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.4rem;
+            }
+
+            .user-info {
+                font-size: 0.9rem;
+                margin-right: 10px;
+            }
+
+            .slider-container {
+                height: 300px;
+            }
+
+            .slider-button {
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .products {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky-cart {
+                bottom: 20px;
+                right: 20px;
+            }
+
+            .sticky-cart-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+        }
     </style>
 </head>
 <body>
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">Bakkal App</a>
-    <div class="ml-auto d-flex align-items-center">
-        <button class="btn btn-outline-primary position-relative mr-2" data-toggle="modal" data-target="#cartModal">
-            🛒 Sepetim
-            <span id="cart-count" class="badge badge-danger cart-badge">0</span>
-        </button>
-        <div class="user-buttons">
-            <a th:href="@{/register}" class="btn btn-primary" th:if="${username} == null">Üye Ol</a>
-            <a th:href="@{/login}" class="btn btn-secondary" th:if="${username} == null">Giriş Yap</a>
-            <form action="/logout" method="POST" th:if="${username} != null" class="d-inline">
-                <button type="submit" class="btn btn-danger">Çıkış Yap</button>
-            </form>
+<nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <i class="fas fa-store"></i>Bakkal App
+        </a>
+        <div class="ml-auto d-flex align-items-center">
+            <!-- Kullanıcı adı gösterimi -->
+            <div class="user-info" th:if="${name} != null">
+                <i class="fas fa-user"></i>
+                <span th:text="${name}">Kullanıcı Adı</span>
+            </div>
+
+            <button class="btn cart-btn position-relative" data-toggle="modal" data-target="#cartModal">
+                <i class="fas fa-shopping-cart"></i> Sepetim
+                <span id="cart-count" class="cart-badge">0</span>
+            </button>
+            <div class="user-buttons">
+                <a th:href="@{/register}" class="btn btn-outline-light" th:if="${username} == null">Üye Ol</a>
+                <a th:href="@{/login}" class="btn btn-light" th:if="${username} == null">Giriş Yap</a>
+                <form th:action="@{/logout}" method="post" th:if="${username} != null" class="d-inline">
+                    <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                    <button type="submit" class="btn btn-outline-light">
+                        <i class="fas fa-sign-out-alt"></i> Çıkış Yap
+                    </button>
+                </form>
+            </div>
         </div>
     </div>
 </nav>
 
-<div class="container mt-3">
-    <div class="slider-container mt-4">
+<!-- Sticky Cart Button -->
+<div class="sticky-cart" id="stickyCart">
+    <button class="sticky-cart-btn" data-toggle="modal" data-target="#cartModal">
+        <i class="fas fa-shopping-cart"></i>
+        <span class="sticky-cart-badge" id="sticky-cart-count">0</span>
+    </button>
+</div>
+
+<div class="container">
+    <!-- Slider -->
+    <div class="slider-container">
         <div class="slider" id="slider">
             <div class="slide" style="background-image: url('/images/kampanya-1.png');"></div>
             <div class="slide" style="background-image: url('/images/kampanya-2.png');"></div>
@@ -62,66 +535,161 @@
         <button class="slider-button" id="next-slide">&#10095;</button>
     </div>
 
-    <h3 class="text-center mt-5">Ürünler</h3>
-    <div class="products">
-        <div th:each="product : ${products}" class="product"
-             th:data-id="${product.id}"
-             th:data-name="${product.name}"
-             th:data-price="${product.price}">
-            <img th:src="${product.imageUrl}" alt="Ürün Resmi" style="width:100%; height:150px; object-fit:cover; border-radius:8px;"/>
-            <h5 th:text="${product.name}">Ürün Adı</h5>
-            <p th:text="${product.description}">Ürün açıklaması</p>
-            <div class="price" th:text="${product.price + ' ₺'}">0 ₺</div>
-            <form class="add-to-cart-form">
-                <input type="hidden" name="productId" th:value="${product.id}"/>
-                <input type="hidden" name="name" th:value="${product.name}"/>
-                <input type="hidden" name="price" th:value="${product.price}"/>
-                <input type="hidden" name="quantity" value="1"/>
-                <button type="submit" class="btn btn-sm btn-success mt-2 add-to-cart-btn">Sepete Ekle</button>
-            </form>
-        </div>
+    <!-- Categories -->
+    <div class="categories">
+        <button class="category-btn active">Tüm Ürünler</button>
+        <button class="category-btn">Temel Gıda</button>
+        <button class="category-btn">İçecekler</button>
+        <button class="category-btn">Atıştırmalık</button>
+        <button class="category-btn">Temizlik</button>
     </div>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <h2 class="section-title">Taze Ürünler</h2>
+        <div class="products">
+            <div th:each="product : ${products}" class="product"
+                 th:data-id="${product.id}"
+                 th:data-name="${product.name}"
+                 th:data-price="${product.price}"
+                 th:data-stock="${product.stockQuantity}">
+                <img th:src="${product.imageUrl}" alt="Ürün Resmi" class="product-image"/>
+                <h5 th:text="${product.name}">Ürün Adı</h5>
+                <p class="product-description" th:text="${product.description}">Ürün açıklaması</p>
+                <div class="product-price" th:text="${product.price + ' ₺'}">0 ₺</div>
+                <form class="add-to-cart-form">
+                    <input type="hidden" name="productId" th:value="${product.id}"/>
+                    <input type="hidden" name="name" th:value="${product.name}"/>
+                    <input type="hidden" name="price" th:value="${product.price}"/>
+                    <input type="hidden" name="quantity" value="1"/>
+                    <button type="submit" class="add-to-cart-btn">
+                        <i class="fas fa-cart-plus"></i> Sepete Ekle
+                    </button>
+                </form>
+                <!-- Quantity controls will be added dynamically -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-truck"></i>
+                        </div>
+                        <h4>Hızlı Teslimat</h4>
+                        <p>30 dakika içinde kapınızda</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h4>Güvenli Ödeme</h4>
+                        <p>256-bit SSL ile koruma</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <i class="fas fa-leaf"></i>
+                        </div>
+                        <h4>Taze Ürünler</h4>
+                        <p>Günlük taze ürün garantisi</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 </div>
 
+<!-- Cart Modal -->
 <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="cartModalLabel">Sepetiniz</h5>
+                <h5 class="modal-title" id="cartModalLabel">
+                    <i class="fas fa-shopping-cart"></i> Sepetiniz
+                </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Kapat">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body" id="cart-items"></div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Alışverişe Devam Et</button>
-                <button type="button" class="btn btn-success" id="checkout-btn" onclick="goToCheckout()">Ödeme</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    <i class="fas fa-arrow-left"></i> Alışverişe Devam Et
+                </button>
+                <button type="button" class="btn btn-success" id="checkout-btn" onclick="goToCheckout()">
+                    <i class="fas fa-credit-card"></i> Ödeme Yap
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Toast Container -->
 <div id="toast-container"></div>
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
+    // Slider functionality
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const totalSlides = slides.length;
+
+    function showSlide(index) {
+        const slider = document.getElementById('slider');
+        slider.style.transform = `translateX(-${index * 100}%)`;
+    }
+
+    function nextSlide() {
+        currentSlide = (currentSlide + 1) % totalSlides;
+        showSlide(currentSlide);
+    }
+
+    function prevSlide() {
+        currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+        showSlide(currentSlide);
+    }
+
+    document.getElementById('next-slide').addEventListener('click', nextSlide);
+    document.getElementById('prev-slide').addEventListener('click', prevSlide);
+
+    // Auto slide every 5 seconds
+    setInterval(nextSlide, 5000);
+
+    // Cart functionality
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     function updateCartCount() {
-        document.getElementById('cart-count').textContent = cart.reduce((sum, item) => sum + item.quantity, 0);
+        const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+        document.getElementById('cart-count').textContent = count;
+        document.getElementById('sticky-cart-count').textContent = count;
     }
 
-    function showToast(message) {
+    // Hata mesajları için geliştirilmiş toast fonksiyonu
+    function showToast(message, type = 'success') {
         const toast = document.createElement('div');
-        toast.className = 'toast';
-        toast.innerText = message;
+        toast.className = `toast ${type === 'error' ? 'error-toast' : ''}`;
+        toast.innerHTML = `
+        <i class="fas ${type === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'}"></i>
+        <span>${message}</span>
+    `;
         document.getElementById('toast-container').appendChild(toast);
+
         setTimeout(() => { toast.style.opacity = '1'; }, 10);
-        setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 2500);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => toast.remove(), 500);
+        }, 3000);
     }
 
-    // Home sayfası artı/eksi
     function updateProductQuantityDisplay() {
         document.querySelectorAll('.product').forEach(productDiv => {
             const productId = productDiv.dataset.id.toString();
@@ -132,32 +700,51 @@
 
             if (cartItem) {
                 const quantityDiv = document.createElement('div');
-                quantityDiv.className = 'cart-quantity mt-2 d-flex align-items-center';
+                quantityDiv.className = 'cart-quantity';
+
                 const decreaseBtn = document.createElement('button');
-                decreaseBtn.className = 'btn btn-sm btn-secondary mr-1 decrease-btn';
-                decreaseBtn.innerText = '-';
+                decreaseBtn.className = 'quantity-btn';
+                decreaseBtn.innerHTML = '-';
+
                 const quantitySpan = document.createElement('span');
-                quantitySpan.className = 'mx-2 quantity';
+                quantitySpan.className = 'quantity-display';
                 quantitySpan.textContent = cartItem.quantity;
+
                 const increaseBtn = document.createElement('button');
-                increaseBtn.className = 'btn btn-sm btn-secondary ml-1 increase-btn';
-                increaseBtn.innerText = '+';
+                increaseBtn.className = 'quantity-btn';
+                increaseBtn.innerHTML = '+';
 
                 quantityDiv.appendChild(decreaseBtn);
                 quantityDiv.appendChild(quantitySpan);
                 quantityDiv.appendChild(increaseBtn);
-                productDiv.appendChild(quantityDiv);
 
-                increaseBtn.onclick = () => {
+                const form = productDiv.querySelector('.add-to-cart-form');
+                form.parentNode.insertBefore(quantityDiv, form.nextSibling);
+
+                increaseBtn.onclick = (e) => {
+                    e.preventDefault();
+                    const productId = productDiv.dataset.id.toString();
+                    const cartItem = cart.find(p => p.id === productId);
+                    const stockQuantity = parseInt(productDiv.dataset.stock);
+
+                    if (cartItem.quantity >= stockQuantity) {
+                        showToast(`Üzgünüz, ${cartItem.name} ürününden stokta sadece ${stockQuantity} adet kalmıştır!`, 'error');
+                        return;
+                    }
+
                     cartItem.quantity++;
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartCount();
                     updateProductQuantityDisplay();
+                    showToast(`${cartItem.name} sepete eklendi!`);
                 };
-                decreaseBtn.onclick = () => {
+
+                decreaseBtn.onclick = (e) => {
+                    e.preventDefault();
                     cartItem.quantity--;
                     if (cartItem.quantity <= 0) {
                         cart = cart.filter(p => p.id !== productId);
+                        showToast(`${cartItem.name} sepetten kaldırıldı!`);
                     }
                     localStorage.setItem('cart', JSON.stringify(cart));
                     updateCartCount();
@@ -167,23 +754,55 @@
         });
     }
 
+    // Sticky cart functionality
+    function handleStickyCart() {
+        const stickyCart = document.getElementById('stickyCart');
+        const navbar = document.querySelector('.navbar');
+        const navbarHeight = navbar.offsetHeight;
+
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > navbarHeight) {
+                stickyCart.style.display = 'block';
+            } else {
+                stickyCart.style.display = 'none';
+            }
+        });
+    }
+
+    // Initialize
     updateCartCount();
     updateProductQuantityDisplay();
+    handleStickyCart();
 
-    // Sepete ekle
+    // Add to cart functionality
     document.querySelectorAll('.add-to-cart-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
             const productDiv = this.closest('.product');
             const productId = productDiv.dataset.id.toString();
+            const stockQuantity = parseInt(productDiv.dataset.stock);
             const existing = cart.find(p => p.id === productId);
-            if (existing) existing.quantity++;
-            else cart.push({
-                id: productDiv.dataset.id,
-                name: productDiv.dataset.name,
-                price: parseFloat(productDiv.dataset.price),
-                quantity: 1
-            });
+
+            if (existing) {
+                if (existing.quantity >= stockQuantity) {
+                    showToast(`Üzgünüz, ${productDiv.dataset.name} ürününden stokta sadece ${stockQuantity} adet kalmıştır!`, 'error');
+                    return;
+                }
+                existing.quantity++;
+            } else {
+                if (stockQuantity <= 0) {
+                    showToast(`Üzgünüz, ${productDiv.dataset.name} ürünü stokta kalmamıştır!`, 'error');
+                    return;
+                }
+                cart.push({
+                    id: productDiv.dataset.id,
+                    name: productDiv.dataset.name,
+                    price: parseFloat(productDiv.dataset.price),
+                    quantity: 1,
+                    stock: stockQuantity // Stok bilgisini de sakla
+                });
+            }
+
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             updateProductQuantityDisplay();
@@ -195,35 +814,73 @@
     function renderCartModal() {
         const container = document.getElementById('cart-items');
         container.innerHTML = '';
-        if (cart.length === 0) { container.innerHTML = '<p>Sepetiniz boş.</p>'; return; }
+
+        if (cart.length === 0) {
+            container.innerHTML = `
+                <div class="text-center py-5">
+                    <i class="fas fa-shopping-cart" style="font-size: 3rem; color: #dee2e6;"></i>
+                    <h5 class="mt-3 text-muted">Sepetiniz boş</h5>
+                    <p class="text-muted">Alışverişe başlamak için ürünleri sepete ekleyin</p>
+                </div>
+            `;
+            return;
+        }
+
+        let total = 0;
         cart.forEach(item => {
+            const itemTotal = item.price * item.quantity;
+            total += itemTotal;
+
             const itemDiv = document.createElement('div');
-            itemDiv.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border rounded';
+            itemDiv.className = 'd-flex justify-content-between align-items-center mb-3 p-3 border rounded';
             itemDiv.dataset.id = item.id;
             itemDiv.innerHTML = `
-            <div>
-                <strong>${item.name}</strong>
-                <div class="d-flex align-items-center mt-1">
-                    <button class="btn btn-sm btn-secondary decrease-btn mr-1">-</button>
-                    <span class="mx-2 quantity">${item.quantity}</span>
-                    <button class="btn btn-sm btn-secondary increase-btn ml-1">+</button>
+                <div class="flex-grow-1">
+                    <h6 class="mb-1 font-weight-bold">${item.name}</h6>
+                    <small class="text-muted">${item.price.toFixed(2)} ₺</small>
+                    <div class="d-flex align-items-center mt-2">
+                        <button class="btn btn-sm btn-outline-secondary decrease-btn mr-2">
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="quantity font-weight-bold">${item.quantity}</span>
+                        <button class="btn btn-sm btn-outline-secondary increase-btn ml-2">
+                            <i class="fas fa-plus"></i>
+                        </button>
+                    </div>
                 </div>
-            </div>
-            <div class="price">${(item.price * item.quantity).toFixed(2)} ₺</div>
-        `;
+                <div class="text-right">
+                    <div class="font-weight-bold text-success">${itemTotal.toFixed(2)} ₺</div>
+                </div>
+            `;
             container.appendChild(itemDiv);
         });
 
-        const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
         const totalDiv = document.createElement('div');
-        totalDiv.className = 'mt-3 text-right font-weight-bold';
-        totalDiv.textContent = `Toplam: ${total.toFixed(2)} ₺`;
+        totalDiv.className = 'mt-4 p-3 bg-light rounded';
+        totalDiv.innerHTML = `
+            <div class="d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">Toplam:</h5>
+                <h4 class="mb-0 text-success">${total.toFixed(2)} ₺</h4>
+            </div>
+        `;
         container.appendChild(totalDiv);
 
+        // Add event listeners for quantity buttons
+        // Modal'daki artırma butonu için de stok kontrolü - renderCartModal fonksiyonunda
         container.querySelectorAll('.increase-btn').forEach(btn => {
             btn.onclick = () => {
                 const id = btn.closest('[data-id]').dataset.id;
                 const cartItem = cart.find(p => p.id === id);
+
+                // Ürünün stok bilgisini bul (ürün div'inden al)
+                const productDiv = document.querySelector(`.product[data-id="${id}"]`);
+                const stockQuantity = productDiv ? parseInt(productDiv.dataset.stock) : cartItem.stock || 0;
+
+                if (cartItem.quantity >= stockQuantity) {
+                    showToast(`Üzgünüz, ${cartItem.name} ürününden stokta sadece ${stockQuantity} adet kalmıştır!`, 'error');
+                    return;
+                }
+
                 cartItem.quantity++;
                 localStorage.setItem('cart', JSON.stringify(cart));
                 updateCartCount();
@@ -231,6 +888,7 @@
                 renderCartModal();
             };
         });
+
         container.querySelectorAll('.decrease-btn').forEach(btn => {
             btn.onclick = () => {
                 const id = btn.closest('[data-id]').dataset.id;
@@ -247,16 +905,36 @@
         });
     }
 
+
+
     function goToCheckout() {
+        if (cart.length === 0) {
+            showToast('Sepetiniz boş. Lütfen önce ürün ekleyin.');
+            return;
+        }
         showToast('Ödeme sayfasına yönlendiriliyorsunuz!');
-        // .html uzantısını kaldırın, Spring endpoint'ine yönlendirin
         window.location.href = '/checkout';
     }
 
     $('#cartModal').on('show.bs.modal', renderCartModal);
 
-
+    // Category buttons
+    document.querySelectorAll('.category-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            document.querySelectorAll('.category-btn').forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            // Here you would typically filter products
+            showToast('Kategori değiştirildi: ' + this.textContent);
+        });
+    });
 </script>
+
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2024 Bakkal App. Tüm hakları saklıdır.</p>
+        <p>Her gün taze, her gün lezzetli!</p>
+    </div>
+</footer>
 
 </body>
 </html>

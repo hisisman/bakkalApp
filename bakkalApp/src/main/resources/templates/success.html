@@ -3,14 +3,365 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ödeme Başarılı</title>
+    <title>Sipariş Tamamlandı - Bakkal App</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #28a745;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --instagram: #E1306C;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, var(--primary), var(--info), var(--warning));
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, var(--primary), #20c997);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 25px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 10px 30px rgba(40, 167, 69, 0.3);
+        }
+
+        .success-icon i {
+            font-size: 50px;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes confetti {
+            0% { transform: translateY(0) rotate(0); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+        }
+
+        .confetti {
+            position: fixed;
+            width: 15px;
+            height: 15px;
+            background: var(--primary);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        h2 {
+            color: #2c3e50;
+            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 2.2rem;
+        }
+
+        p {
+            color: #7f8c8d;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 25px 0;
+            border-left: 4px solid var(--primary);
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            color: #2c3e50;
+        }
+
+        .detail-item strong {
+            color: var(--primary);
+        }
+
+        .order-number {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), #20c997);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            margin: 10px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary);
+            color: var(--primary);
+            padding: 12px 25px;
+            font-size: 1rem;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            margin: 10px;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .social-share {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .social-share h5 {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .instagram-btn {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            margin: 0 auto;
+        }
+
+        .instagram-btn:hover {
+            transform: translateY(-3px) scale(1.1);
+            box-shadow: 0 8px 20px rgba(225, 48, 108, 0.4);
+            text-decoration: none;
+            color: white;
+        }
+
+        .rating {
+            margin: 20px 0;
+        }
+
+        .stars {
+            color: #ffc107;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .featured-products {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        .featured-title {
+            color: #7f8c8d;
+            margin-bottom: 15px;
+            font-size: 1rem;
+        }
+
+        .product-scroll {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 10px 0;
+        }
+
+        .product-item {
+            min-width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #28a745, #20c997);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            text-align: center;
+            padding: 10px;
+        }
+
+        @media (max-width: 576px) {
+            .success-container {
+                padding: 30px 20px;
+                margin: 20px;
+            }
+
+            h2 {
+                font-size: 1.8rem;
+            }
+
+            .btn-primary, .btn-outline-primary {
+                padding: 12px 25px;
+                font-size: 1rem;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5 text-center">
-    <h2>Ödeme Başarılı!</h2>
-    <p>Alışverişiniz tamamlandı. Teşekkür ederiz!</p>
-    <a href="/" class="btn btn-primary mt-3">Ana Sayfaya Dön</a>
+<div class="success-container">
+    <div class="success-icon">
+        <i class="fas fa-check"></i>
+    </div>
+
+    <h2>Ödeme Başarılı! 🎉</h2>
+    <p>Siparişiniz başarıyla tamamlandı. Bizi tercih ettiğiniz için teşekkür ederiz!</p>
+
+    <div class="order-details">
+        <div class="detail-item">
+            <span>Sipariş Numarası:</span>
+            <strong class="order-number" id="orderNumber"></strong>
+        </div>
+        <div class="detail-item">
+            <span>Tahmini Teslimat:</span>
+            <strong>30-45 Dakika</strong>
+        </div>
+        <div class="detail-item">
+            <span>Ödeme Yöntemi:</span>
+            <strong>Kredi Kartı</strong>
+        </div>
+    </div>
+
+    <div class="rating">
+        <div class="stars">
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-star-half-alt"></i>
+        </div>
+        <small>Deneyiminizi değerlendirin</small>
+    </div>
+
+    <div class="button-group">
+        <a href="/" class="btn btn-primary">
+            <i class="fas fa-home"></i> Ana Sayfaya Dön
+        </a>
+        <a href="/" class="btn btn-outline-primary">
+            <i class="fas fa-shopping-bag"></i> Alışverişe Devam Et
+        </a>
+    </div>
+
+    <div class="social-share">
+        <h5>Bizi Instagram'dan Takip Edin:</h5>
+        <a href="https://instagram.com/secbegen24" target="_blank" class="instagram-btn">
+            <i class="fab fa-instagram"></i>
+        </a>
+        <p class="mt-2 small text-muted">@secbegen24</p>
+    </div>
+
+    <div class="featured-products">
+        <h5 class="featured-title">Öne Çıkan Ürünler</h5>
+        <div class="product-scroll">
+            <div class="product-item">Taze Ekmek</div>
+            <div class="product-item">Süt</div>
+            <div class="product-item">Yumurta</div>
+            <div class="product-item">Meyve</div>
+            <div class="product-item">İçecek</div>
+        </div>
+    </div>
 </div>
+
+<script>
+    // Rastgele sipariş numarası oluştur
+    function generateOrderNumber() {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '#';
+        for (let i = 0; i < 9; i++) {
+            result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+    }
+
+    // Sayfa yüklendiğinde sipariş numarasını göster
+    document.getElementById('orderNumber').textContent = generateOrderNumber();
+
+    // Konfeti efekti
+    function createConfetti() {
+        const colors = ['#28a745', '#20c997', '#ff6b6b', '#feca57', '#54a0ff'];
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+            confetti.style.animation = `confetti ${Math.random() * 3 + 2}s linear forwards`;
+            document.body.appendChild(confetti);
+
+            setTimeout(() => {
+                confetti.remove();
+            }, 5000);
+        }
+    }
+
+    // Sayfa yüklendiğinde konfeti başlat
+    window.addEventListener('load', function() {
+        createConfetti();
+        setTimeout(createConfetti, 1000);
+        setTimeout(createConfetti, 2000);
+    });
+
+    // Pulse animasyonu için
+    setInterval(() => {
+        document.querySelector('.success-icon').style.animation = 'none';
+        setTimeout(() => {
+            document.querySelector('.success-icon').style.animation = 'pulse 2s infinite';
+        }, 10);
+    }, 4000);
+</script>
 </body>
 </html>

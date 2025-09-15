@@ -28,9 +28,9 @@ INSERT INTO customers (name, email, phone_number) VALUES
 -- Örnek Kullanıcılar (Login)
 -- password = 1234 (plain text, Spring Security encode edilmemiş)
 -- ==============================
-INSERT INTO users (name, email, password, phone_number, username, role) VALUES
-                                                                            ('Admin User', 'admin@example.com', '1234', '5550001111', 'admin', 'ADMIN'),
-                                                                            ('Normal User', 'user@example.com', '1234', '5550002222', 'user', 'USER');
+--INSERT INTO users (name, email, password, phone_number, username, role) VALUES
+  --                                                                          ('Admin User', 'admin@example.com', '1234', '5550001111', 'admin', 'ADMIN'),
+    --                                                                        ('Normal User', 'user@example.com', '1234', '5550002222', 'user', 'USER');
 
 -- ==============================
 -- Örnek Siparişler
