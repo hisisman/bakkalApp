@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ödeme - Bakkal App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <style>
+        body { background-color: #f8f9fa; padding-top: 70px; }
+        .cart-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #ddd; }
+        .cart-item h5 { margin: 0; }
+        .cart-total { font-weight: bold; font-size: 18px; text-align: right; margin-top: 20px; }
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <a class="navbar-brand" href="/">Bakkal App</a>
+</nav>
+
+<div class="container mt-5">
+    <h3 class="mb-4">Sepetiniz</h3>
+    <div id="checkout-items">
+        <!-- Sepet ürünleri buraya JS ile gelecek -->
+    </div>
+    <div class="cart-total" id="checkout-total">Toplam: 0 ₺</div>
+    <button id="pay-btn" class="btn btn-success btn-block mt-4">Ödemeyi Tamamla</button>
+</div>
+
+<script>
+    // Sepet localStorage'dan alınır
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+    const container = document.getElementById('checkout-items');
+    const totalDiv = document.getElementById('checkout-total');
+
+    function renderCart() {
+        container.innerHTML = '';
+        if(cart.length === 0) {
+            container.innerHTML = '<p>Sepetiniz boş.</p>';
+            totalDiv.textContent = 'Toplam: 0 ₺';
+            return;
+        }
+
+        let total = 0;
+        cart.forEach(item => {
+            total += item.price * item.quantity;
+            const div = document.createElement('div');
+            div.className = 'cart-item';
+            div.innerHTML = `
+                <div>
+                    <h5>${item.name}</h5>
+                    <small>${item.quantity} x ${item.price.toFixed(2)} ₺</small>
+                </div>
+                <div>${(item.price * item.quantity).toFixed(2)} ₺</div>
+            `;
+            container.appendChild(div);
+        });
+
+        totalDiv.textContent = `Toplam: ${total.toFixed(2)} ₺`;
+    }
+
+    renderCart();
+
+    // Ödeme butonu
+    document.getElementById('pay-btn').addEventListener('click', () => {
+        localStorage.removeItem('cart');
+        // .html uzantısını kaldırın
+        window.location.href = '/checkout/success';
+    });
+</script>
+</body>
+</html>

@@ -7,61 +7,18 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
     <style>
         body { background-color: #f8f9fa; padding-top: 70px; }
-
         /* Navbar */
         .navbar { position: fixed; top: 0; left: 0; width: 100%; z-index: 1030; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
         .navbar .ml-auto { display: flex; align-items: center; }
         .cart-badge { position: absolute; top: -5px; right: -10px; font-size: 12px; }
-
         /* Slider */
-        .slider-container {
-            position: relative;
-            width: 100%;
-            max-width: 1200px;
-            height: 350px;
-            margin: 20px auto;
-            overflow: hidden;
-            border-radius: 15px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.25);
-        }
-        .slider {
-            display: flex;
-            height: 100%;
-            transition: transform 0.5s ease-in-out;
-        }
-        .slide {
-            min-width: 100%;
-            height: 100%;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        .slider-button {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(0,0,0,0.4);
-            border: none;
-            color: white;
-            font-size: 28px;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            cursor: pointer;
-            z-index: 2;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        .slider-button:hover {
-            background: rgba(0,0,0,0.7);
-            transform: translateY(-50%) scale(1.2);
-            box-shadow: 0 6px 15px rgba(0,0,0,0.5);
-        }
+        .slider-container { position: relative; width: 100%; max-width: 1200px; height: 350px; margin: 20px auto; overflow: hidden; border-radius: 15px; box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+        .slider { display: flex; height: 100%; transition: transform 0.5s ease-in-out; }
+        .slide { min-width: 100%; height: 100%; background-size: cover; background-position: center; background-repeat: no-repeat; }
+        .slider-button { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.4); border: none; color: white; font-size: 28px; border-radius: 50%; width: 50px; height: 50px; cursor: pointer; z-index: 2; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; }
+        .slider-button:hover { background: rgba(0,0,0,0.7); transform: translateY(-50%) scale(1.2); box-shadow: 0 6px 15px rgba(0,0,0,0.5); }
         #prev-slide { left: 15px; }
         #next-slide { right: 15px; }
-
         /* Ürünler */
         .products { display: flex; flex-wrap: wrap; justify-content: center; margin-top: 40px; }
         .product { width: 220px; margin: 15px; padding: 15px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); transition: transform 0.2s ease-in-out; position: relative; }
@@ -70,7 +27,6 @@
         .product p { font-size: 14px; color: #666; }
         .product .price { font-size: 18px; font-weight: bold; color: #28a745; margin-top: 10px; }
         .product form { margin-top: 10px; }
-
         /* Toast */
         #toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 2000; }
         .toast { background: #28a745; color: #fff; padding: 10px 15px; border-radius: 5px; margin-top: 5px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.5s ease; }
@@ -78,17 +34,13 @@
 </head>
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="/">Bakkal App</a>
     <div class="ml-auto d-flex align-items-center">
-        <!-- Sepet Butonu -->
         <button class="btn btn-outline-primary position-relative mr-2" data-toggle="modal" data-target="#cartModal">
             🛒 Sepetim
             <span id="cart-count" class="badge badge-danger cart-badge">0</span>
         </button>
-
-        <!-- Kullanıcı butonları -->
         <div class="user-buttons">
             <a th:href="@{/register}" class="btn btn-primary" th:if="${username} == null">Üye Ol</a>
             <a th:href="@{/login}" class="btn btn-secondary" th:if="${username} == null">Giriş Yap</a>
@@ -100,8 +52,6 @@
 </nav>
 
 <div class="container mt-3">
-
-    <!-- Slider -->
     <div class="slider-container mt-4">
         <div class="slider" id="slider">
             <div class="slide" style="background-image: url('/images/kampanya-1.png');"></div>
@@ -112,7 +62,6 @@
         <button class="slider-button" id="next-slide">&#10095;</button>
     </div>
 
-    <!-- Ürünler -->
     <h3 class="text-center mt-5">Ürünler</h3>
     <div class="products">
         <div th:each="product : ${products}" class="product"
@@ -134,7 +83,6 @@
     </div>
 </div>
 
-<!-- Sepet Modal -->
 <div class="modal fade" id="cartModal" tabindex="-1" aria-labelledby="cartModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
@@ -144,12 +92,10 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <div class="modal-body" id="cart-items">
-                <!-- Sepet ürünleri JS ile gelecek -->
-            </div>
+            <div class="modal-body" id="cart-items"></div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Alışverişe Devam Et</button>
-                <button type="button" class="btn btn-success" id="checkout-btn">Ödeme</button>
+                <button type="button" class="btn btn-success" id="checkout-btn" onclick="goToCheckout()">Ödeme</button>
             </div>
         </div>
     </div>
@@ -157,11 +103,9 @@
 
 <div id="toast-container"></div>
 
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <script>
-    // Sepet işlemleri
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     function updateCartCount() {
@@ -177,18 +121,16 @@
         setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 2500);
     }
 
-    // Ürün kartlarında artı/eksi yönetimi
+    // Home sayfası artı/eksi
     function updateProductQuantityDisplay() {
         document.querySelectorAll('.product').forEach(productDiv => {
             const productId = productDiv.dataset.id.toString();
             const cartItem = cart.find(p => p.id === productId);
 
-            // Önce eski div varsa kaldır
             let oldQuantityDiv = productDiv.querySelector('.cart-quantity');
             if (oldQuantityDiv) oldQuantityDiv.remove();
 
             if (cartItem) {
-                // Sepette varsa artı/eksi divi ekle
                 const quantityDiv = document.createElement('div');
                 quantityDiv.className = 'cart-quantity mt-2 d-flex align-items-center';
                 const decreaseBtn = document.createElement('button');
@@ -206,7 +148,6 @@
                 quantityDiv.appendChild(increaseBtn);
                 productDiv.appendChild(quantityDiv);
 
-                // Buton eventleri
                 increaseBtn.onclick = () => {
                     cartItem.quantity++;
                     localStorage.setItem('cart', JSON.stringify(cart));
@@ -223,14 +164,13 @@
                     updateProductQuantityDisplay();
                 };
             }
-            // Sepette yoksa div eklenmez, yani görünmez
         });
     }
 
     updateCartCount();
     updateProductQuantityDisplay();
 
-    // Sepete ekle butonu
+    // Sepete ekle
     document.querySelectorAll('.add-to-cart-form').forEach(form => {
         form.addEventListener('submit', function(e) {
             e.preventDefault();
@@ -238,14 +178,12 @@
             const productId = productDiv.dataset.id.toString();
             const existing = cart.find(p => p.id === productId);
             if (existing) existing.quantity++;
-            else {
-                cart.push({
-                    id: productDiv.dataset.id,
-                    name: productDiv.dataset.name,
-                    price: parseFloat(productDiv.dataset.price),
-                    quantity: 1
-                });
-            }
+            else cart.push({
+                id: productDiv.dataset.id,
+                name: productDiv.dataset.name,
+                price: parseFloat(productDiv.dataset.price),
+                quantity: 1
+            });
             localStorage.setItem('cart', JSON.stringify(cart));
             updateCartCount();
             updateProductQuantityDisplay();
@@ -253,32 +191,26 @@
         });
     });
 
-    // Sepet modalı
+    // Modal render
     function renderCartModal() {
         const container = document.getElementById('cart-items');
         container.innerHTML = '';
-
-        if (cart.length === 0) {
-            container.innerHTML = '<p>Sepetiniz boş.</p>';
-            return;
-        }
-
+        if (cart.length === 0) { container.innerHTML = '<p>Sepetiniz boş.</p>'; return; }
         cart.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.className = 'd-flex justify-content-between align-items-center mb-2 p-2 border rounded';
             itemDiv.dataset.id = item.id;
-
             itemDiv.innerHTML = `
-                <div>
-                    <strong>${item.name}</strong>
-                    <div class="d-flex align-items-center mt-1">
-                        <button class="btn btn-sm btn-secondary decrease-btn mr-1">-</button>
-                        <span class="mx-2 quantity">${item.quantity}</span>
-                        <button class="btn btn-sm btn-secondary increase-btn ml-1">+</button>
-                    </div>
+            <div>
+                <strong>${item.name}</strong>
+                <div class="d-flex align-items-center mt-1">
+                    <button class="btn btn-sm btn-secondary decrease-btn mr-1">-</button>
+                    <span class="mx-2 quantity">${item.quantity}</span>
+                    <button class="btn btn-sm btn-secondary increase-btn ml-1">+</button>
                 </div>
-                <div class="price">${(item.price * item.quantity).toFixed(2)} ₺</div>
-            `;
+            </div>
+            <div class="price">${(item.price * item.quantity).toFixed(2)} ₺</div>
+        `;
             container.appendChild(itemDiv);
         });
 
@@ -288,7 +220,6 @@
         totalDiv.textContent = `Toplam: ${total.toFixed(2)} ₺`;
         container.appendChild(totalDiv);
 
-        // Modal içi artı/eksi
         container.querySelectorAll('.increase-btn').forEach(btn => {
             btn.onclick = () => {
                 const id = btn.closest('[data-id]').dataset.id;
@@ -316,14 +247,16 @@
         });
     }
 
+    function goToCheckout() {
+        showToast('Ödeme sayfasına yönlendiriliyorsunuz!');
+        // .html uzantısını kaldırın, Spring endpoint'ine yönlendirin
+        window.location.href = '/checkout';
+    }
+
     $('#cartModal').on('show.bs.modal', renderCartModal);
 
-    // Ödeme butonu
-    document.getElementById('checkout-btn').addEventListener('click', () => {
-        alert('Ödeme sayfasına yönlendirileceksiniz.');
-    });
+
 </script>
 
 </body>
 </html>
-

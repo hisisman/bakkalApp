@@ -25,6 +25,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/login",
                                 "/register",
+                                "/checkout",           // BU SATIRI EKLEYİN
+                                "/checkout/success",   // BU SATIRI EKLEYİN
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
