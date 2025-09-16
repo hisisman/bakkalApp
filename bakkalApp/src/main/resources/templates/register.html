@@ -297,10 +297,71 @@
     }
 
     // Telefon numarası formatı
+    function formatPhone(value) {
+        // Sadece rakamları al
+        value = value.replace(/\D/g, '');
+
+        // Başında 0 yoksa ekle
+        if (!value.startsWith('0')) {
+            value = '0' + value;
+        }
+
+        // Maksimum 11 hane
+        if (value.length > 11) value = value.slice(0, 11);
+
+        // Format: 0 (XXX) XXX XXXX
+        let formatted = '';
+        if (value.length > 0) {
+            formatted = value[0]; // 0
+        }
+        if (value.length > 1) {
+            formatted += ' (' + value.substring(1, 4); // (530
+        }
+        if (value.length >= 4) {
+            formatted += ') ' + value.substring(4, 7); // ) 540
+        }
+        if (value.length >= 7) {
+            formatted += ' ' + value.substring(7); // 2824
+        }
+
+        return formatted;
+    }
+
+    // Input event
     document.getElementById('phoneNumber').addEventListener('input', function(e) {
-        let value = e.target.value.replace(/\D/g, '');
-        if (value.length > 10) value = value.slice(0, 10);
-        e.target.value = value;
+        e.target.value = formatPhone(e.target.value);
+    });
+
+    // Telefon numarası alanına odaklanınca
+    document.getElementById('phoneNumber').addEventListener('focus', function(e) {
+        // Eğer input boşsa veya sadece (0 içeriyorsa
+        if (!this.value || this.value === '(0') {
+            this.value = '(05';
+            this.setSelectionRange(3, 3); // İmleci "5" ten sonraya koy
+        } else if (this.value.startsWith('(0')) {
+            // Değer zaten formatlanmışsa, imleci sona al
+            this.setSelectionRange(this.value.length, this.value.length);
+        }
+    });
+
+
+
+    // Sayfa yüklendiğinde mevcut değeri formatla
+    document.addEventListener('DOMContentLoaded', function() {
+        const phoneInput = document.getElementById('phoneNumber');
+        if (phoneInput.value) {
+            phoneInput.value = formatPhone(phoneInput.value);
+        }
+    });
+
+    // Form submit edilirken sadece rakam kalsın
+    document.querySelector('form').addEventListener('submit', function() {
+        const phoneInput = document.getElementById('phoneNumber');
+        let cleanedValue = phoneInput.value.replace(/\D/g, '');
+        if (!cleanedValue.startsWith('0')) {
+            cleanedValue = '0' + cleanedValue;
+        }
+        phoneInput.value = cleanedValue;
     });
 </script>
 

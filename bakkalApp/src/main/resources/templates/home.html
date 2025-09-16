@@ -487,7 +487,7 @@
 
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container">
-        <a class="navbar-brand" href="/">
+        <a class="navbar-brand" href="/home">
             <i class="fas fa-store"></i>Bakkal App
         </a>
         <div class="ml-auto d-flex align-items-center">
@@ -529,9 +529,10 @@
     <!-- Slider -->
     <div class="slider-container">
         <div class="slider" id="slider">
-            <div class="slide" style="background-image: url('/images/kampanya-1.png');"></div>
-            <div class="slide" style="background-image: url('/images/kampanya-2.png');"></div>
-            <div class="slide" style="background-image: url('/images/kampanya-3.png');"></div>
+            <div th:each="campaign : ${campaigns}"
+                 class="slide"
+                 th:style="'background-image: url(/campaigns/' + ${campaign.id} + '/image)'">
+            </div>
         </div>
         <button class="slider-button" id="prev-slide">&#10094;</button>
         <button class="slider-button" id="next-slide">&#10095;</button>
