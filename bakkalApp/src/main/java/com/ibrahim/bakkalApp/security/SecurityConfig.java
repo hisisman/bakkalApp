@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -18,38 +19,64 @@ public class SecurityConfig {
 		this.userDetailsService = userDetailsService;
 	}
 
+//    @Bean
+//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+//        http
+//                .csrf(csrf -> csrf
+//                        .ignoringRequestMatchers("/h2-console/**")
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+//                        .ignoringRequestMatchers("/api/update-stock") // CSRF'yi bu endpoint için ignore et
+//                )
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(
+//                                "/login",
+//                                "/register",
+//                                "/checkout",
+//                                "/checkout/success",
+//                                "/css/**",
+//                                "/js/**",
+//                                "/images/**",
+//                                "/h2-console/**"
+//                        ).permitAll()
+//                        .requestMatchers("/api/update-stock").permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .headers(headers -> headers
+//                        .frameOptions(frame -> frame.disable())
+//                )
+//                .formLogin(formLogin -> formLogin
+//                        .loginPage("/login") // DÜZELTME: /home yerine /login
+//                        .loginProcessingUrl("/login") // Formun submit edileceği URL
+//                        .defaultSuccessUrl("/home", true) // Başarılı girişte yönlendirme
+//                        .failureUrl("/login?error=true") // Hatalı girişte yönlendirme
+//                        .permitAll()
+//                )
+//                .logout(logout -> logout
+//                        .logoutUrl("/logout")
+//                        .logoutSuccessUrl("/login?logout")
+//                        .permitAll()
+//                );
+//
+//        return http.build();
+//    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/login",
-                                "/register",
-                                "/checkout",
-                                "/checkout/success",
-                                "/css/**",
-                                "/js/**",
-                                "/images/**",
-                                "/h2-console/**"
-                        ).permitAll()
+                .csrf(csrf -> csrf.disable()) // Geliştirme için CSRF'yi devre dışı bırak
+                .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/api/**").permitAll() // Tüm API endpoint'lerine izin ver
+                        .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**",
+                                "/register", "/login", "/checkout/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .headers(headers -> headers
-                        .frameOptions(frame -> frame.disable())
-                )
-                .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/h2-console/**")
-                )
-                .formLogin(formLogin -> formLogin
-                        .loginPage("/login") // DÜZELTME: /home yerine /login
-                        .loginProcessingUrl("/login") // Formun submit edileceği URL
-                        .defaultSuccessUrl("/home", true) // Başarılı girişte yönlendirme
-                        .failureUrl("/login?error=true") // Hatalı girişte yönlendirme
+                .formLogin(form -> form
+                        .loginPage("/login")
+                        .defaultSuccessUrl("/home")
                         .permitAll()
                 )
                 .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        .logoutSuccessUrl("/")
                         .permitAll()
                 );
 

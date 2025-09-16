@@ -160,15 +160,41 @@
             color: var(--dark);
             text-decoration: none;
         }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 15px 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 20px rgba(220, 53, 69, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
+
+<!-- CSRF Token'ı meta tag olarak ekleyin
+<meta name="_csrf" th:content="${_csrf.token}">
+<meta name="_csrf_header" th:content="${_csrf.headerName}">
+-->
 <nav class="navbar navbar-expand-lg navbar-light fixed-top">
     <div class="container">
         <a class="navbar-brand" href="/">
             <i class="fas fa-store"></i> Bakkal App
         </a>
-        <a href="/" class="back-to-home">
+        <a href="/home" class="back-to-home">
             <i class="fas fa-arrow-left"></i> Alışverişe Devam Et
         </a>
     </div>
@@ -186,6 +212,12 @@
                 <i class="fas fa-shopping-cart"></i> Sepetim
             </h4>
 
+            <!-- Stok hatalarını göstermek için alan -->
+            <div id="stock-errors"></div>
+
+            <!-- Debug bilgileri (gerekirse) -->
+            <div id="debug-info" class="debug-info"></div>
+
             <div id="checkout-items">
                 <!-- Sepet ürünleri buraya JS ile gelecek -->
             </div>
@@ -201,11 +233,53 @@
     </div>
 </div>
 
+<!-- Toast mesajı için -->
+<div id="toast" class="toast">
+    <i class="fas fa-exclamation-circle"></i>
+    <span id="toast-message"></span>
+</div>
+
 <script>
     let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
     const container = document.getElementById('checkout-items');
     const totalDiv = document.getElementById('checkout-total');
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toast-message');
+    const stockErrorsDiv = document.getElementById('stock-errors');
+    const debugInfoDiv = document.getElementById('debug-info');
+
+    function showToast(message, type = 'error') {
+        toastMessage.textContent = message;
+        if (type === 'success') {
+            toast.style.background = 'linear-gradient(135deg, #28a745, #20c997)';
+        } else {
+            toast.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+        }
+        toast.classList.add('show');
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+        }, 3000);
+    }
+
+
+    function showStockErrors(errors) {
+        if (errors.length === 0) {
+            stockErrorsDiv.innerHTML = '';
+            return;
+        }
+
+        let html = '<div class="stock-error">';
+        html += '<h5><i class="fas fa-exclamation-triangle"></i> Stok Problemleri</h5>';
+        html += '<ul>';
+        errors.forEach(error => {
+            html += `<li>${error}</li>`;
+        });
+        html += '</ul></div>';
+
+        stockErrorsDiv.innerHTML = html;
+    }
 
     function renderCart() {
         container.innerHTML = '';
@@ -254,25 +328,143 @@
         `;
     }
 
-    renderCart();
 
-    // Ödeme butonu
-    document.getElementById('pay-btn').addEventListener('click', () => {
+    // Debug için API yanıtını göster
+    function showDebugInfo(info) {
+        debugInfoDiv.textContent = JSON.stringify(info, null, 2);
+    }
+
+
+    // Tekil ürün stok kontrolü
+    async function getProductStock(productId) {
+        try {
+            const response = await fetch(`/api/products/${productId}/stock`);
+            return await response.json();
+        } catch (error) {
+            console.error('Ürün stok bilgisi alınamadı:', error);
+            return null;
+        }
+    }
+
+    // Stok güncelleme fonksiyonu - Güncellenmiş
+    async function updateStock() {
+        try {
+            const csrfToken = getCsrfToken();
+            const csrfHeaderName = getCsrfHeaderName();
+
+            console.log('CSRF Token:', csrfToken);
+            console.log('CSRF Header:', csrfHeaderName);
+
+            const response = await fetch('/api/update-stock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                    [csrfHeaderName]: csrfToken // Dynamic header name
+                },
+                body: JSON.stringify({
+                    cart: cart,
+                    _csrf: csrfToken // Body'de de gönderilebilir
+                })
+            });
+
+            console.log('Response status:', response.status);
+
+            if (response.status === 403) {
+                return {
+                    success: false,
+                    error: 'Erişim engellendi. Lütfen giriş yapın veya sayfayı yenileyin.',
+                    status: response.status
+                };
+            }
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const result = await response.json();
+            console.log('API Response:', result);
+
+            return { success: true, data: result };
+
+        } catch (error) {
+            console.error('Stok güncelleme hatası:', error);
+            return {
+                success: false,
+                error: error.message || 'Sunucu hatası: Stok güncellenemedi.',
+                status: error.status
+            };
+        }
+    }
+
+    // CSRF token'ını almak için örnek fonksiyon
+    //function getCsrfToken() {
+        // Bu kısım backend yapınıza göre değişiklik gösterebilir
+        //const metaTag = document.querySelector('meta[name="_csrf"]');
+        //if (metaTag) {
+        //    return metaTag.getAttribute('content');
+        //}
+        //return '';
+    //}
+
+    // CSRF Token fonksiyonları
+    function getCsrfToken() {
+        return document.querySelector('meta[name="_csrf"]')?.content || '';
+    }
+
+
+    function getCsrfHeaderName() {
+        return document.querySelector('meta[name="_csrf_header"]')?.content || 'X-CSRF-TOKEN';
+    }
+
+    // Ödeme butonu event listener'ı
+    document.getElementById('pay-btn').addEventListener('click', async () => {
         if(cart.length === 0) {
-            alert('Sepetiniz boş. Lütfen önce ürün ekleyin.');
+            showToast('Sepetiniz boş. Lütfen önce ürün ekleyin.');
             return;
         }
 
-        // Ödeme animasyonu
         const payBtn = document.getElementById('pay-btn');
-        payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÖDENİYOR...';
+        const originalText = payBtn.innerHTML;
+        payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> STOK KONTROLÜ...';
         payBtn.disabled = true;
 
-        setTimeout(() => {
-            localStorage.removeItem('cart');
-            window.location.href = '/checkout/success';
-        }, 2000);
+        try {
+            const stockUpdateResult = await updateStock();
+
+            if (stockUpdateResult.success) {
+                payBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ÖDENİYOR...';
+
+                setTimeout(() => {
+                    localStorage.removeItem('cart');
+                    // Ana sayfaya yönlendir ve yenileme parametresi ekle
+                    window.location.href = '/?refreshed=' + new Date().getTime();
+                }, 2000);
+            } else {
+                payBtn.innerHTML = originalText;
+                payBtn.disabled = false;
+
+                if (stockUpdateResult.status === 403) {
+                    // CSRF token sorunu - sayfayı yenile
+                    showToast('Oturum süreniz dolmuş. Lütfen sayfayı yenileyin.');
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 2000);
+                } else {
+                    showToast(stockUpdateResult.error || 'Stok güncelleme hatası.');
+                }
+            }
+        } catch (error) {
+            payBtn.innerHTML = originalText;
+            payBtn.disabled = false;
+            showToast('Bir hata oluştu. Lütfen tekrar deneyin.');
+            console.error('Ödeme hatası:', error);
+        }
     });
+
+    renderCart();
+    // Debug için: localStorage'daki sepeti konsola yazdır
+    console.log('Sepet içeriği:', cart);
 
     // Sepet değişikliklerini dinle
     window.addEventListener('storage', function(e) {

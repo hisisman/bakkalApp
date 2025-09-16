@@ -1,20 +1,20 @@
 -- ==============================
 -- Örnek Ürünler
 -- ==============================
-INSERT INTO products (name, description, price, stock_quantity, image_url)
-VALUES ('Elma', 'Yeşil elma, taze ve lezzetli', 10.0, 100, '/images/apple.jpg');
-
-INSERT INTO products (name, description, price, stock_quantity, image_url)
-VALUES ('Armut', 'Sarı armut, tatlı ve sulu', 12.0, 50, '/images/armut.png');
-
-INSERT INTO products (name, description, price, stock_quantity, image_url)
-VALUES ('Muz', 'Sarı muz, olgun', 15.0, 30, '/images/banana.jpeg');
-
-INSERT INTO products (name, description, price, stock_quantity, image_url)
-VALUES ('Çilek', 'Taze çilek, paket 500g', 25.0, 20, '/images/strawberry.jpg');
-
-INSERT INTO products (name, description, price, stock_quantity, image_url)
-VALUES ('Domates', 'Kırmızı domates, kg', 8.0, 200, '/images/tomato.jpeg');
+-- INSERT INTO products (name, description, price, stock_quantity, image_url)
+-- VALUES ('Elma', 'Yeşil elma, taze ve lezzetli', 10.0, 100, '/images/apple.jpg');
+--
+-- INSERT INTO products (name, description, price, stock_quantity, image_url)
+-- VALUES ('Armut', 'Sarı armut, tatlı ve sulu', 12.0, 50, '/images/armut.png');
+--
+-- INSERT INTO products (name, description, price, stock_quantity, image_url)
+-- VALUES ('Muz', 'Sarı muz, olgun', 15.0, 30, '/images/banana.jpeg');
+--
+-- INSERT INTO products (name, description, price, stock_quantity, image_url)
+-- VALUES ('Çilek', 'Taze çilek, paket 500g', 25.0, 20, '/images/strawberry.jpg');
+--
+-- INSERT INTO products (name, description, price, stock_quantity, image_url)
+-- VALUES ('Domates', 'Kırmızı domates, kg', 8.0, 200, '/images/tomato.jpeg');
 
 -- ==============================
 -- Örnek Müşteriler

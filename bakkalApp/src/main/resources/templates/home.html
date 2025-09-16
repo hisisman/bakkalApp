@@ -505,7 +505,9 @@
                 <a th:href="@{/register}" class="btn btn-outline-light" th:if="${username} == null">Üye Ol</a>
                 <a th:href="@{/login}" class="btn btn-light" th:if="${username} == null">Giriş Yap</a>
                 <form th:action="@{/logout}" method="post" th:if="${username} != null" class="d-inline">
+                    <!--
                     <input type="hidden" name="_csrf" th:value="${_csrf.token}" />
+                    -->
                     <button type="submit" class="btn btn-outline-light">
                         <i class="fas fa-sign-out-alt"></i> Çıkış Yap
                     </button>
@@ -642,6 +644,15 @@
     let currentSlide = 0;
     const slides = document.querySelectorAll('.slide');
     const totalSlides = slides.length;
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('refreshed')) {
+        // LocalStorage'daki sepeti temizle
+        localStorage.removeItem('cart');
+        // Sayfayı yenile (stok bilgilerini güncellemek için)
+        setTimeout(() => {
+            window.location.href = '/'; // parametresiz URL'ye yönlendir
+        }, 100);
+    }
 
     function showSlide(index) {
         const slider = document.getElementById('slider');
@@ -774,41 +785,6 @@
     updateProductQuantityDisplay();
     handleStickyCart();
 
-    // Add to cart functionality
-    document.querySelectorAll('.add-to-cart-form').forEach(form => {
-        form.addEventListener('submit', function(e) {
-            e.preventDefault();
-            const productDiv = this.closest('.product');
-            const productId = productDiv.dataset.id.toString();
-            const stockQuantity = parseInt(productDiv.dataset.stock);
-            const existing = cart.find(p => p.id === productId);
-
-            if (existing) {
-                if (existing.quantity >= stockQuantity) {
-                    showToast(`Üzgünüz, ${productDiv.dataset.name} ürününden stokta sadece ${stockQuantity} adet kalmıştır!`, 'error');
-                    return;
-                }
-                existing.quantity++;
-            } else {
-                if (stockQuantity <= 0) {
-                    showToast(`Üzgünüz, ${productDiv.dataset.name} ürünü stokta kalmamıştır!`, 'error');
-                    return;
-                }
-                cart.push({
-                    id: productDiv.dataset.id,
-                    name: productDiv.dataset.name,
-                    price: parseFloat(productDiv.dataset.price),
-                    quantity: 1,
-                    stock: stockQuantity // Stok bilgisini de sakla
-                });
-            }
-
-            localStorage.setItem('cart', JSON.stringify(cart));
-            updateCartCount();
-            updateProductQuantityDisplay();
-            showToast(`${productDiv.dataset.name} sepete eklendi!`);
-        });
-    });
 
     // Modal render
     function renderCartModal() {
@@ -928,7 +904,133 @@
         });
     });
 </script>
+<!-- home.html içerisine aşağıdaki script'i ekleyin -->
 
+<script>
+    // Sayfa yüklendiğinde ve belirli aralıklarla stok durumunu güncelle
+    document.addEventListener('DOMContentLoaded', function() {
+        // Sayfa yüklendiğinde stokları kontrol et
+        checkStockStatus();
+
+        // Her 30 saniyede bir stok durumunu güncelle
+        setInterval(checkStockStatus, 30000);
+
+        // Sepet değişikliklerinde de stokları kontrol et
+        window.addEventListener('storage', function(e) {
+            if (e.key === 'cart') {
+                checkStockStatus();
+            }
+        });
+    });
+
+    // Stok durumunu kontrol et ve güncelle
+    async function checkStockStatus() {
+        try {
+            const response = await fetch('/api/products/stock');
+            const products = await response.json();
+
+            if (response.ok) {
+                updateProductDisplays(products);
+            }
+        } catch (error) {
+            console.error('Stok durumu güncellenirken hata:', error);
+        }
+    }
+
+    // Ürün görünümlerini güncelle
+    function updateProductDisplays(products) {
+        products.forEach(product => {
+            const productElement = document.querySelector(`.product[data-id="${product.id}"]`);
+            if (productElement) {
+                // Stok durumuna göre butonu etkinleştir/devre dışı bırak
+                const addButton = productElement.querySelector('.add-to-cart-btn');
+                const quantityDiv = productElement.querySelector('.cart-quantity');
+
+                if (product.stockQuantity <= 0) {
+                    // Stok yoksa
+                    addButton.disabled = true;
+                    addButton.innerHTML = '<i class="fas fa-times"></i> Stokta Yok';
+                    addButton.style.background = 'linear-gradient(135deg, #dc3545, #c82333)';
+
+                    if (quantityDiv) {
+                        quantityDiv.style.opacity = '0.5';
+                    }
+                } else {
+                    // Stok varsa
+                    addButton.disabled = false;
+                    addButton.innerHTML = '<i class="fas fa-cart-plus"></i> Sepete Ekle';
+                    addButton.style.background = 'linear-gradient(135deg, var(--primary), #20c997)';
+
+                    if (quantityDiv) {
+                        quantityDiv.style.opacity = '1';
+                    }
+                }
+
+                // Mevcut sepetteki miktarı kontrol et
+                const cart = JSON.parse(localStorage.getItem('cart')) || [];
+                const cartItem = cart.find(item => item.id == product.id);
+
+                if (cartItem && cartItem.quantity >= product.stockQuantity) {
+                    // Sepetteki miktar stoktan fazlaysa
+                    const increaseBtn = productElement.querySelector('.quantity-btn:last-child');
+                    if (increaseBtn) {
+                        increaseBtn.disabled = true;
+                        increaseBtn.style.opacity = '0.5';
+                        increaseBtn.title = 'Maksimum stok adedine ulaştınız';
+                    }
+                }
+            }
+        });
+    }
+
+    // Sepete ekleme işlevinde stok kontrolünü güçlendir
+    document.querySelectorAll('.add-to-cart-form').forEach(form => {
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const productDiv = this.closest('.product');
+            const productId = productDiv.dataset.id.toString();
+
+            // Gerçek zamanlı stok kontrolü
+            try {
+                const response = await fetch(`/api/products/${productId}/stock`);
+                const productStock = await response.json();
+
+                if (response.ok && productStock.stockQuantity > 0) {
+                    // Normal sepete ekleme işlemi
+                    const existing = cart.find(p => p.id === productId);
+
+                    if (existing) {
+                        if (existing.quantity >= productStock.stockQuantity) {
+                            showToast(`Üzgünüz, ${productDiv.dataset.name} ürününden stokta sadece ${productStock.stockQuantity} adet kalmıştır!`, 'error');
+                            return;
+                        }
+                        existing.quantity++;
+                    } else {
+                        cart.push({
+                            id: productDiv.dataset.id,
+                            name: productDiv.dataset.name,
+                            price: parseFloat(productDiv.dataset.price),
+                            quantity: 1
+                        });
+                    }
+
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartCount();
+                    updateProductQuantityDisplay();
+                    showToast(`${productDiv.dataset.name} sepete eklendi!`);
+
+                    // Stok durumunu tekrar kontrol et
+                    checkStockStatus();
+                } else {
+                    showToast('Ürün stokta kalmamıştır!', 'error');
+                }
+            } catch (error) {
+                console.error('Stok kontrolü hatası:', error);
+                showToast('Stok kontrolü yapılamadı!', 'error');
+            }
+        });
+    });
+</script>
 <footer class="footer">
     <div class="container">
         <p>&copy; 2024 Bakkal App. Tüm hakları saklıdır.</p>
