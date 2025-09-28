@@ -2,6 +2,8 @@ package com.ibrahim.bakkalApp.entity;
 
 import jakarta.persistence.*;
 
+import java.util.Base64;
+
 @Entity
 @Table(name = "campaigns")
 public class Campaign {
@@ -15,6 +17,9 @@ public class Campaign {
     private byte[] image;
 
     private String mimeType;
+
+    @Transient
+    private String imageBase64;
 
     // --- Getter & Setter ---
     public Long getId() {
@@ -47,5 +52,18 @@ public class Campaign {
 
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
+    }
+
+
+    // Getter ve Setter metodları
+    public String getImageBase64() {
+        if (this.image != null && this.mimeType != null) {
+            return Base64.getEncoder().encodeToString(this.image);
+        }
+        return null;
+    }
+
+    public void setImageBase64(String imageBase64) {
+        this.imageBase64 = imageBase64;
     }
 }

@@ -4,6 +4,7 @@
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n</Property>
         <Property name="LOG_DIR">logs</Property>
         <Property name="LOG_FILE">application.log</Property>
+        <Property name="ARCHIVED_LOG_FILE">application-%d{yyyy-MM-dd}-%i.log.gz</Property>
     </Properties>
 
     <Appenders>
@@ -12,15 +13,10 @@
             <PatternLayout pattern="${LOG_PATTERN}"/>
         </Console>
 
-        <!-- File Appender -->
-        <File name="File" fileName="${LOG_DIR}/${LOG_FILE}" append="true">
-            <PatternLayout pattern="${LOG_PATTERN}"/>
-        </File>
-
-        <!-- Rolling File Appender (Opsiyonel - dosya boyutu ve zaman bazlı rotation) -->
+        <!-- Sadece RollingFile Appender kullanıyoruz -->
         <RollingFile name="RollingFile"
                      fileName="${LOG_DIR}/${LOG_FILE}"
-                     filePattern="${LOG_DIR}/application-%d{yyyy-MM-dd}-%i.log.gz">
+                     filePattern="${LOG_DIR}/${ARCHIVED_LOG_FILE}">
             <PatternLayout pattern="${LOG_PATTERN}"/>
             <Policies>
                 <SizeBasedTriggeringPolicy size="10MB"/>
@@ -34,25 +30,25 @@
         <!-- Spring Framework Logging -->
         <Logger name="org.springframework" level="INFO" additivity="false">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
+            <AppenderRef ref="RollingFile"/>
         </Logger>
 
         <!-- Hibernate Logging -->
         <Logger name="org.hibernate" level="WARN" additivity="false">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
+            <AppenderRef ref="RollingFile"/>
         </Logger>
 
         <!-- Application Logging -->
         <Logger name="com.springframework" level="DEBUG" additivity="false">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
+            <AppenderRef ref="RollingFile"/>
         </Logger>
 
         <!-- Root Logger -->
         <Root level="INFO">
             <AppenderRef ref="Console"/>
-            <AppenderRef ref="File"/>
+            <AppenderRef ref="RollingFile"/>
         </Root>
     </Loggers>
 </Configuration>

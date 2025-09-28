@@ -286,6 +286,7 @@
             overflow: hidden;
         }
 
+
         .product:hover {
             transform: translateY(-8px);
             box-shadow: 0 15px 35px rgba(0,0,0,0.15);
@@ -442,6 +443,14 @@
             margin-top: 60px;
         }
 
+
+        .slide-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Resmi tamamen kaplatır, keserek sığdırır */
+            object-position: center; /* Resmi ortalar */
+        }
+
         @media (max-width: 768px) {
             .navbar-brand {
                 font-size: 1.4rem;
@@ -461,6 +470,8 @@
                 height: 50px;
                 font-size: 20px;
             }
+
+
 
             .section-title {
                 font-size: 2rem;
@@ -529,9 +540,13 @@
     <!-- Slider -->
     <div class="slider-container">
         <div class="slider" id="slider">
-            <div th:each="campaign : ${campaigns}"
-                 class="slide"
-                 th:style="'background-image: url(/campaigns/' + ${campaign.id} + '/image)'">
+            <div th:each="campaign : ${campaigns}" class="slide">
+                <img th:if="${campaign.image != null}"
+                     th:src="'data:' + ${campaign.mimeType} + ';base64,' + ${campaign.imageBase64}"
+                     alt="Kampanya Resmi" class="slide-image"/>
+                <img th:unless="${campaign.imageBase64 != null}"
+                     src="/default-campaign-image.jpg"
+                     alt="Varsayılan Kampanya Resmi" class="slide-image"/>
             </div>
         </div>
         <button class="slider-button" id="prev-slide">&#10094;</button>
@@ -555,8 +570,15 @@
                  th:data-id="${product.id}"
                  th:data-name="${product.name}"
                  th:data-price="${product.price}"
-                 th:data-stock="${product.stockQuantity}">
-                <img th:src="${product.imageUrl}" alt="Ürün Resmi" class="product-image"/>
+                 th:data-stock="${product.stockQuantity}"
+                 th:data-image="${product.image}"
+                 th:data-mimeType="${product.mimeType}">
+                <img th:if="${product.imageBase64 != null}"
+                     th:src="'data:' + ${product.mimeType} + ';base64,' + ${product.imageBase64}"
+                     alt="Ürün Resmi" class="product-image"/>
+                <img th:unless="${product.imageBase64 != null}"
+                     src="/default-product-image.jpg"
+                     alt="Varsayılan Ürün Resmi" class="product-image"/>
                 <h5 th:text="${product.name}">Ürün Adı</h5>
                 <p class="product-description" th:text="${product.description}">Ürün açıklaması</p>
                 <div class="product-price" th:text="${product.price + ' ₺'}">0 ₺</div>

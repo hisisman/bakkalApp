@@ -9,15 +9,13 @@ import com.ibrahim.bakkalApp.service.ProductService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,7 +41,21 @@ public class HomeController {
 	@GetMapping("/home")
 	public String homePage(@AuthenticationPrincipal UserDetails userDetails, Model model) {
         List<Product> products = productRepository.findAll();
+
+        for (Product product : products) {
+            if (product.getImage() != null) {
+                String base64Image = Base64.getEncoder().encodeToString(product.getImage());
+                product.setImageBase64(base64Image); // Product sınıfına geçici bir alan eklemeniz gerekebilir
+            }
+        }
         List<Campaign> campaigns = campaignRepository.findAll();
+        for(Campaign campaign : campaigns) {
+            if(campaign.getImage() != null) {
+                String base64Image = Base64.getEncoder().encodeToString(campaign.getImage());
+                campaign.setImageBase64(base64Image);
+            }
+        }
+
         model.addAttribute("campaigns", campaigns);
         model.addAttribute("products", products);
 		if (userDetails != null) {
@@ -54,19 +66,45 @@ public class HomeController {
 		return "home"; // home.html dosyasına yönlendirme
 	}
 
-    @GetMapping("/campaigns/{id}/image")
-    public ResponseEntity<byte[]> getImage(@PathVariable Long id) {
-        return campaignRepository.findById(id)
-                .map(c -> ResponseEntity.ok()
-                        .header(HttpHeaders.CONTENT_TYPE, c.getMimeType())
-                        .body(c.getImage()))
-                .orElse(ResponseEntity.notFound().build());
-    }
+//    @GetMapping("/campaigns/{id}/image")
+//    public Optional<ResponseEntity<String>> getImage(@PathVariable Long id) {
+//        return campaignRepository.findById(id)
+//                .map(c -> ResponseEntity.ok()
+//                        .header(HttpHeaders.CONTENT_TYPE, c.getMimeType())
+//                        .body(c.getImageBase64()));
+//    }
+//
+//    @GetMapping("/default")
+//    public String defaultAfterLogin() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//
+//        if (authentication != null && authentication.getAuthorities().stream()
+//                .anyMatch(auth -> auth.getAuthority().equals("ROLE_ADMIN"))) {
+//            return "redirect:/admin/product-management";
+//        }
+//        return "redirect:/home";
+//    }
 
     @GetMapping("/")
     public String home(Model model) {
         // Sadece stokta olan ürünleri getir
         List<Product> availableProducts = productService.findByStockQuantityGreaterThan(0);
+        for (Product product : availableProducts) {
+            if (product.getImage() != null) {
+                String base64Image = Base64.getEncoder().encodeToString(product.getImage());
+                product.setImageBase64(base64Image); // Product sınıfına geçici bir alan eklemeniz gerekebilir
+            }
+        }
+
+        List<Campaign> campaigns = campaignRepository.findAll();
+        for(Campaign campaign : campaigns) {
+            if(campaign.getImage() != null) {
+                String base64Image = Base64.getEncoder().encodeToString(campaign.getImage());
+                campaign.setImageBase64(base64Image);
+            }
+        }
+
+        model.addAttribute("campaigns", campaigns);
         model.addAttribute("products", availableProducts);
         return "home";
     }

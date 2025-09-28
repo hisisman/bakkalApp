@@ -51,7 +51,8 @@ public class StockApiController {
                     int quantity = Integer.parseInt(item.get("quantity").toString());
 
                     // Ürünü bul ve stoktan düş
-                    Product product = productService.findById(productId);
+                    Product product = productService.findById(productId)
+                            .orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
 
                     if (product == null) {
                         errors.add("Ürün bulunamadı: ID " + productId);
@@ -78,7 +79,8 @@ public class StockApiController {
                 Long productId = Long.valueOf(item.get("id").toString());
                 int quantity = Integer.parseInt(item.get("quantity").toString());
 
-                Product product = productService.findById(productId);
+                Product product = productService.findById(productId)
+                        .orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + productId));
                 product.setStockQuantity(product.getStockQuantity() - quantity);
                 productService.save(product);
                 System.out.println("Stock updated for product " + productId +
@@ -112,7 +114,8 @@ public class StockApiController {
     @GetMapping("/products/{id}/stock")
     public ResponseEntity<ProductStockDTO> getProductStock(@PathVariable Long id) {
         try {
-            Product product = productService.findById(id);
+            Product product = productService.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Ürün bulunamadı: " + id));
             if (product == null) {
                 return ResponseEntity.notFound().build();
             }

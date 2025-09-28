@@ -3,13 +3,13 @@ package com.ibrahim.bakkalApp.service;
 import com.ibrahim.bakkalApp.entity.Product;
 import com.ibrahim.bakkalApp.repository.ProductRepository;
 import jakarta.transaction.Transactional;
-import jdk.jfr.Threshold;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -41,8 +41,8 @@ public class ProductService {
         return productRepository.findAllById(longs);
     }
 
-    public Product findById(Long productId) {
-        return  productRepository.findById(productId).orElse(null);
+    public Optional<Product> findById(Long id) {
+        return productRepository.findById(id);
     }
 
     public void save(Product product) {
@@ -62,6 +62,10 @@ public class ProductService {
 
     public List<Product> findByStockQuantityGreaterThan(int stockQuantity) {
         return productRepository.findByStockQuantityGreaterThan(stockQuantity);
+    }
+
+    public void deleteById(Long id) {
+        productRepository.deleteById(id);
     }
 
     //public List<Product> findByStockQuantityGreaterThan(int i) {

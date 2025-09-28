@@ -438,7 +438,7 @@
                 setTimeout(() => {
                     localStorage.removeItem('cart');
                     // Ana sayfaya yönlendir ve yenileme parametresi ekle
-                    window.location.href = '/?refreshed=' + new Date().getTime();
+                    window.location.href = '/home';
                 }, 2000);
             } else {
                 payBtn.innerHTML = originalText;

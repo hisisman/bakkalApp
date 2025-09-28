@@ -7,6 +7,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 
 @Configuration
 @EnableWebSecurity
@@ -65,14 +66,20 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable()) // Geliştirme için CSRF'yi devre dışı bırak
                 .authorizeHttpRequests(authz -> authz
+                        .requestMatchers("/h2-console/**").permitAll() // H2 Console için izin ver
+                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/**").permitAll() // Tüm API endpoint'lerine izin ver
                         .requestMatchers("/", "/home", "/css/**", "/js/**", "/images/**",
                                 "/register", "/login", "/checkout/**").permitAll()
                         .anyRequest().authenticated()
                 )
+                .headers(headers -> headers
+                        .addHeaderWriter(new XFrameOptionsHeaderWriter(
+                                XFrameOptionsHeaderWriter.XFrameOptionsMode.SAMEORIGIN)) // H2 Console için gerekli
+                )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .defaultSuccessUrl("/home")
+                        .defaultSuccessUrl("/default", true) // Yeni endpoint
                         .permitAll()
                 )
                 .logout(logout -> logout

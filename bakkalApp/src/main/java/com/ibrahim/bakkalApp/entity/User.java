@@ -84,4 +84,12 @@ public class User {
 	public void setRole(String role) {
 		this.role = role;
 	}
+
+    // Spring Security için rolü düzgün formatta döndüren metod
+    public String getSecurityRole() {
+        if (role != null && !role.startsWith("ROLE_")) {
+            return "ROLE_" + role;
+        }
+        return role;
+    }
 }
