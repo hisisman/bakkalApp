@@ -1,369 +1,168 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org" lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Üye Ol - Bakkal App</title>
+    <title>Üye Ol - Bakkal App Premium</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #28a745;
-            --secondary: #6c757d;
-            --light: #f8f9fa;
-            --dark: #343a40;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+            --primary: #10b981;
+            --primary-dark: #059669;
+            --bg: #0f172a;
         }
 
         body {
-            font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            background-image: radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(16, 185, 129, 0.05) 0%, transparent 40%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
-        .register-container {
-            background: white;
-            border-radius: 25px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        .register-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
             padding: 40px;
             width: 100%;
-            max-width: 500px;
-            position: relative;
-            overflow: hidden;
+            max-width: 550px;
+            box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
         }
 
-        .register-container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 6px;
-            background: linear-gradient(90deg, var(--primary), #20c997);
-        }
-
-        .register-header {
+        .brand-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
             text-align: center;
             margin-bottom: 30px;
         }
 
-        .register-header h2 {
-            color: var(--dark);
-            font-weight: 700;
-            margin-bottom: 10px;
-            font-size: 2.2rem;
+        .brand-logo i {
+            transform: rotate(-10deg);
+            margin-right: 12px;
         }
 
-        .register-header p {
-            color: var(--secondary);
-            font-size: 1rem;
-        }
-
-        .register-icon {
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(135deg, var(--primary), #20c997);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 2rem;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-group label {
-            display: block;
+        .form-label {
+            color: #94a3b8;
+            font-weight: 600;
             margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark);
+            font-size: 0.9rem;
         }
 
         .form-control {
-            border: 2px solid #e9ecef;
-            border-radius: 15px;
-            padding: 15px 20px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 12px 15px;
+            color: white;
             height: 50px;
+            transition: all 0.3s ease;
         }
 
         .form-control:focus {
+            background: rgba(255, 255, 255, 0.1);
             border-color: var(--primary);
-            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+            box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+            color: white;
         }
 
-        .form-control.is-invalid {
-            border-color: #dc3545;
-            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        .btn-premium {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 15px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            width: 100%;
+            margin-top: 20px;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.2);
         }
 
-        .input-icon {
-            position: relative;
-        }
-
-        .input-icon i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary);
-            z-index: 2;
-        }
-
-        .input-icon .form-control {
-            padding-left: 45px;
+        .btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 25px 50px rgba(16, 185, 129, 0.3);
+            background: var(--primary-dark);
+            color: white;
         }
 
         .invalid-feedback {
             display: block;
-            color: #dc3545;
-            font-size: 0.875rem;
+            color: #ef4444;
+            font-size: 0.8rem;
             margin-top: 5px;
             font-weight: 500;
         }
-
-        .btn-register {
-            background: linear-gradient(135deg, var(--primary), #20c997);
-            border: none;
-            color: white;
-            padding: 15px;
-            border-radius: 15px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            width: 100%;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
-        }
-
-        .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(40, 167, 69, 0.4);
-        }
-
-        .login-link {
-            text-align: center;
-            margin-top: 25px;
-            padding-top: 20px;
-            border-top: 1px solid #e9ecef;
-        }
-
-        .login-link p {
-            color: var(--secondary);
-            margin-bottom: 0;
-        }
-
-        .login-link a {
-            color: var(--primary);
-            text-decoration: none;
-            font-weight: 600;
-            transition: all 0.3s ease;
-        }
-
-        .login-link a:hover {
-            color: #20c997;
-            text-decoration: underline;
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            cursor: pointer;
-            color: var(--secondary);
-            z-index: 2;
-        }
-
-        .role-info {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            color: var(--secondary);
-            margin-top: 5px;
-        }
-
-        @media (max-width: 576px) {
-            .register-container {
-                padding: 30px 20px;
-                margin: 20px;
-            }
-
-            .register-header h2 {
-                font-size: 1.8rem;
-            }
-        }
     </style>
 </head>
+
 <body>
 
-<div class="register-container">
-    <div class="register-header">
-        <div class="register-icon">
-            <i class="fas fa-user-plus"></i>
-        </div>
-        <h2>Yeni Hesap Oluştur</h2>
-        <p>Bakkal App ailesine katılın</p>
-    </div>
-
-    <form th:action="@{/register}" method="post" th:object="${user}">
-        <!-- Ad Soyad -->
-        <div class="form-group input-icon">
-            <i class="fas fa-user"></i>
-            <input type="text" id="name" class="form-control" th:field="*{name}" placeholder="Adınız Soyadınız" required>
+    <div class="register-card">
+        <div class="brand-logo">
+            <i class="fas fa-shopping-basket"></i>BAKKAL
         </div>
 
-        <!-- Email -->
-        <div class="form-group input-icon">
-            <i class="fas fa-envelope"></i>
-            <input type="email" id="email" class="form-control" th:field="*{email}" placeholder="E-posta adresiniz" required>
-        </div>
+        <h3 class="text-white font-weight-bold mb-2 text-center">Hesap Oluştur</h3>
+        <p class="text-muted mb-4 text-center">Bakkal App premium dünyasına katılın.</p>
 
-        <!-- Telefon -->
-        <div class="form-group input-icon">
-            <i class="fas fa-phone"></i>
-            <input type="text" id="phoneNumber" class="form-control" th:field="*{phoneNumber}" placeholder="Telefon numaranız" required>
-        </div>
-
-        <!-- Kullanıcı Adı -->
-        <div class="form-group input-icon">
-            <i class="fas fa-at"></i>
-            <input type="text" id="username" class="form-control" th:classappend="${usernameError} ? 'is-invalid'"
-                   th:field="*{username}" placeholder="Kullanıcı adınız" required>
-            <div th:if="${usernameError}" class="invalid-feedback">
-                <i class="fas fa-exclamation-circle"></i> <span th:text="${usernameError}"></span>
+        <form th:action="@{/register}" method="POST" th:object="${user}">
+            <div class="row">
+                <div class="col-md-6 form-group mb-3">
+                    <label class="form-label">Ad Soyad</label>
+                    <input type="text" th:field="*{name}" class="form-control" placeholder="John Doe" required>
+                </div>
+                <div class="col-md-6 form-group mb-3">
+                    <label class="form-label">Kullanıcı Adı</label>
+                    <input type="text" th:field="*{username}" class="form-control" placeholder="johndoe"
+                        th:classappend="${usernameError} ? 'is-invalid'" required>
+                    <div th:if="${usernameError}" class="invalid-feedback" th:text="${usernameError}"></div>
+                </div>
             </div>
-        </div>
 
-        <!-- Şifre -->
-        <div class="form-group input-icon">
-            <i class="fas fa-lock"></i>
-            <input type="password" id="password" class="form-control" th:field="*{password}" placeholder="Şifreniz" required>
-            <span class="password-toggle" onclick="togglePassword('password')">
-                <i class="fas fa-eye"></i>
-            </span>
-        </div>
-
-        <!-- Rol -->
-        <div class="form-group">
-            <label for="role">Hesap Türü:</label>
-            <input type="text" id="role" class="form-control" th:field="*{role}" value="USER" readonly>
-            <div class="role-info">
-                <i class="fas fa-info-circle"></i> Tüm kullanıcılar "USER" olarak kaydolur
+            <div class="form-group mb-3">
+                <label class="form-label">E-posta</label>
+                <input type="email" th:field="*{email}" class="form-control" placeholder="john@example.com" required>
             </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">Telefon</label>
+                <input type="text" th:field="*{phoneNumber}" class="form-control" placeholder="0500 000 00 00" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label class="form-label">Adres</label>
+                <textarea th:field="*{address}" class="form-control"
+                    placeholder="Mahalle, Sokak, No... Adresinizi buraya girin."
+                    style="height: auto; min-height: 80px;"></textarea>
+            </div>
+
+            <div class="form-group mb-4">
+                <label class="form-label">Şifre</label>
+                <input type="password" th:field="*{password}" class="form-control" placeholder="••••••••" required>
+            </div>
+
+            <input type="hidden" th:field="*{role}" value="USER">
+
+            <button type="submit" class="btn-premium">Kayıt Ol</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="text-muted">Zaten hesabınız mı var? <a th:href="@{/login}"
+                    class="text-primary font-weight-bold">Giriş Yap</a></p>
         </div>
-
-        <button type="submit" class="btn-register">
-            <i class="fas fa-user-plus"></i> Hesap Oluştur
-        </button>
-    </form>
-
-    <div class="login-link">
-        <p>Zaten üye misiniz? <a th:href="@{/login}">Giriş Yapın</a></p>
     </div>
-</div>
-
-<script>
-    function togglePassword(inputId) {
-        const input = document.getElementById(inputId);
-        const icon = input.nextElementSibling.querySelector('i');
-
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
-
-    // Telefon numarası formatı
-    function formatPhone(value) {
-        // Sadece rakamları al
-        value = value.replace(/\D/g, '');
-
-        // Başında 0 yoksa ekle
-        if (!value.startsWith('0')) {
-            value = '0' + value;
-        }
-
-        // Maksimum 11 hane
-        if (value.length > 11) value = value.slice(0, 11);
-
-        // Format: 0 (XXX) XXX XXXX
-        let formatted = '';
-        if (value.length > 0) {
-            formatted = value[0]; // 0
-        }
-        if (value.length > 1) {
-            formatted += ' (' + value.substring(1, 4); // (530
-        }
-        if (value.length >= 4) {
-            formatted += ') ' + value.substring(4, 7); // ) 540
-        }
-        if (value.length >= 7) {
-            formatted += ' ' + value.substring(7); // 2824
-        }
-
-        return formatted;
-    }
-
-    // Input event
-    document.getElementById('phoneNumber').addEventListener('input', function(e) {
-        e.target.value = formatPhone(e.target.value);
-    });
-
-    // Telefon numarası alanına odaklanınca
-    document.getElementById('phoneNumber').addEventListener('focus', function(e) {
-        // Eğer input boşsa veya sadece (0 içeriyorsa
-        if (!this.value || this.value === '(0') {
-            this.value = '(05';
-            this.setSelectionRange(3, 3); // İmleci "5" ten sonraya koy
-        } else if (this.value.startsWith('(0')) {
-            // Değer zaten formatlanmışsa, imleci sona al
-            this.setSelectionRange(this.value.length, this.value.length);
-        }
-    });
-
-
-
-    // Sayfa yüklendiğinde mevcut değeri formatla
-    document.addEventListener('DOMContentLoaded', function() {
-        const phoneInput = document.getElementById('phoneNumber');
-        if (phoneInput.value) {
-            phoneInput.value = formatPhone(phoneInput.value);
-        }
-    });
-
-    // Form submit edilirken sadece rakam kalsın
-    document.querySelector('form').addEventListener('submit', function() {
-        const phoneInput = document.getElementById('phoneNumber');
-        let cleanedValue = phoneInput.value.replace(/\D/g, '');
-        if (!cleanedValue.startsWith('0')) {
-            cleanedValue = '0' + cleanedValue;
-        }
-        phoneInput.value = cleanedValue;
-    });
-</script>
 
 </body>
+
 </html>

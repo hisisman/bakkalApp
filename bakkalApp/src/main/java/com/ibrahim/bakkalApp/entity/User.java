@@ -28,7 +28,17 @@ public class User {
 
 	private String role;
 
+	private String address;
+
 	// Getter ve Setter Metodları
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
 	public Long getId() {
 		return id;
 	}
@@ -85,11 +95,11 @@ public class User {
 		this.role = role;
 	}
 
-    // Spring Security için rolü düzgün formatta döndüren metod
-    public String getSecurityRole() {
-        if (role != null && !role.startsWith("ROLE_")) {
-            return "ROLE_" + role;
-        }
-        return role;
-    }
+	// Spring Security için rolü düzgün formatta döndüren metod
+	public String getSecurityRole() {
+		if (role != null && !role.startsWith("ROLE_")) {
+			return "ROLE_" + role;
+		}
+		return role;
+	}
 }

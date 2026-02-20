@@ -43,7 +43,7 @@ INSERT INTO users (name, email, phone_number, username, password, role) VALUES
 -- ==============================
 -- Örnek Siparişler
 -- ==============================
-INSERT INTO orders (total_amount, customer_id, order_date) VALUES
+INSERT INTO orders (total_amount, user_id, order_date) VALUES
 (50.0, 1, CURRENT_TIMESTAMP),
 (120.0, 2, CURRENT_TIMESTAMP),
 (30.0, 3, CURRENT_TIMESTAMP);

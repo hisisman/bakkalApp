@@ -14,24 +14,26 @@ import java.util.Base64;
 @Table(name = "products")
 public class Product {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String name;
-	private String description;
-	private double price;
+    private String name;
+    private String description;
+    private double price;
     @Column(name = "stock_quantity")
     @Min(value = 0, message = "Stok miktarı 0'dan küçük olamaz")
-	private int stockQuantity;
+    private int stockQuantity;
     private String imageUrl; // ürün resmi için yeni alan
-    //@NotBlank(message = "Barkod zorunludur")
+    // @NotBlank(message = "Barkod zorunludur")
     private String barcode;
 
     @Lob
     private byte[] image;
 
     private String mimeType;
+
+    private String category;
 
     @Transient
     private String imageBase64;
@@ -125,6 +127,15 @@ public class Product {
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
     }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     // Getter ve Setter metodları
     public String getImageBase64() {
         if (this.image != null && this.mimeType != null) {
@@ -137,7 +148,11 @@ public class Product {
         this.imageBase64 = imageBase64;
     }
 
+    public String getBarcode() {
+        return barcode;
+    }
 
-    public String getBarcode() { return barcode; }
-    public void setBarcode(String barcode) { this.barcode = barcode; }
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
 }

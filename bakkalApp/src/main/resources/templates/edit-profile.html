@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="tr" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profili Düzenle - Bakkal App</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="description"
+        content="Profil bilgilerinizi güncelleyin. Ad, e-posta, telefon ve adres bilgilerinizi buradan düzenleyebilirsiniz.">
+    <style>
+        :root {
+            --primary: #10b981;
+            --bg: #f8fafc;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg);
+            padding-top: 100px;
+        }
+
+        .edit-card {
+            background: white;
+            border-radius: 32px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control {
+            border-radius: 12px;
+            padding: 12px 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 700;
+            border: none;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg fixed-top bg-white border-bottom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand font-weight-bold text-primary" href="/home">BAKKAL</a>
+        </div>
+    </nav>
+    <main>
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="edit-card">
+                        <h1 class="font-weight-bold mb-4" style="font-size: 1.8rem;">Profili Düzenle</h1>
+                        <form th:action="@{/profile/edit}" method="post">
+                            <div>
+                                <label class="form-label">Ad Soyad</label>
+                                <input type="text" name="name" th:value="${user.name}" class="form-control" required>
+                            </div>
+                            <div>
+                                <label class="form-label">E-posta</label>
+                                <input type="email" name="email" th:value="${user.email}" class="form-control" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Telefon</label>
+                                <input type="text" name="phoneNumber" th:value="${user.phoneNumber}"
+                                    class="form-control" required>
+                            </div>
+                            <div>
+                                <label class="form-label">Adres</label>
+                                <textarea name="address" th:text="${user.address}" class="form-control"
+                                    rows="3"></textarea>
+                            </div>
+                            <div class="mt-4">
+                                <button type="submit" class="btn-save btn-block">Değişiklikleri Kaydet</button>
+                                <a href="/profile" class="btn btn-link btn-block text-muted">İptal</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+
+</html>

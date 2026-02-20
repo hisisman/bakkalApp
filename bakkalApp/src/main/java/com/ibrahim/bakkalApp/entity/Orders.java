@@ -18,8 +18,8 @@ public class Orders {
 	private Long id;
 
 	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+	@JoinColumn(name = "user_id")
+	private User user;
 
 	private Date orderDate;
 	private double totalAmount;
